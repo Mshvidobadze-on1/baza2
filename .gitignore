@@ -1,0 +1,7 @@
+node_modules/
+baza.db
+baza.db-shm
+baza.db-wal
+prepare-data.js
+*.log
+.DS_Store

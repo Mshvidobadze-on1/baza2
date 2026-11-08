@@ -1,0 +1,23 @@
+{
+  "name": "baza2",
+  "version": "1.0.0",
+  "description": "საქართველოს შინაგან საქმეთა სამინისტრო - მონაცემთა ბაზა 2 (baza2)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node build-db.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "keywords": [
+    "baza",
+    "search",
+    "sqlite"
+  ],
+  "author": "lucaskawaiii",
+  "license": "ISC",
+  "dependencies": {
+    "isomorphic-git": "^1.44.11"
+  }
+}

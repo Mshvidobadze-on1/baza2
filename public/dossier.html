@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/jpeg" href="/logo.jpg" />
+  <title>შინაგან საქმეთა სამინისტრო — პიროვნების პირადი საქმე (PDF)</title>
+  <style>
+    :root {
+      --mia-navy: #091528;
+      --mia-blue: #142b52;
+      --mia-gold: #c59b43;
+      --mia-gold-light: #e4c57b;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --muted: #475569;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 8mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: "BPG Arial", "Sylfaen", "Segoe UI", system-ui, sans-serif;
+      background: #08101f;
+      color: var(--text);
+      padding: 22px 14px 40px;
+    }
+
+    .toolbar {
+      max-width: 920px;
+      margin: 0 auto 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #f8fafc;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      transition: all 0.15s;
+    }
+
+    .btn:hover {
+      background: #334155;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #b88e3d 0%, #d4af61 100%);
+      color: #08101f;
+      border-color: #e5c478;
+    }
+
+    .btn-gold:hover {
+      filter: brightness(1.06);
+    }
+
+    /* Official A4 Sheet */
+    .dossier-sheet {
+      position: relative;
+      max-width: 920px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 2px solid var(--mia-blue);
+      outline: 4px double var(--mia-gold);
+      outline-offset: -8px;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Subtle Watermark */
+    .watermark {
+      position: absolute;
+      top: 54%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 360px;
+      height: 360px;
+      object-fit: contain;
+      opacity: 0.035;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header */
+    .dossier-header {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, #091528 0%, #162f59 100%);
+      color: #ffffff;
+      padding: 18px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid var(--mia-gold);
+      gap: 16px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-logo {
+      width: 68px;
+      height: 68px;
+      object-fit: contain;
+      border-radius: 9px;
+      border: 2px solid var(--mia-gold);
+      background: #0a1931;
+      padding: 2px;
+    }
+
+    .header-titles .sub-en {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      color: var(--mia-gold-light);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .header-titles h1 {
+      font-size: 1.32rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-top: 2px;
+      color: #ffffff;
+    }
+
+    .header-titles p {
+      color: #cbd5e1;
+      font-size: 0.84rem;
+      margin-top: 2px;
+    }
+
+    .header-stamp {
+      text-align: right;
+      font-size: 0.78rem;
+      color: #e2e8f0;
+      border: 1px solid rgba(197, 155, 67, 0.55);
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(9, 21, 40, 0.65);
+      line-height: 1.45;
+      white-space: nowrap;
+    }
+
+    .header-stamp .classified {
+      color: var(--mia-gold-light);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.73rem;
+      margin-top: 3px;
+    }
+
+    /* Body */
+    .dossier-body {
+      position: relative;
+      z-index: 1;
+      padding: 20px 26px 18px;
+    }
+
+    .doc-banner {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid var(--mia-blue);
+      padding: 8px 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #1e293b;
+      font-weight: 700;
+    }
+
+    /* Main Grid: Info on Left, Compact Full Photos on Right */
+    .top-section {
+      display: grid;
+      grid-template-columns: 1fr 205px;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 720px) {
+      .top-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Right Side Photos Column */
+    .photos-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .photo-card {
+      border: 1.5px solid #94a3b8;
+      border-top: 3px solid var(--mia-blue);
+      border-radius: 6px;
+      padding: 8px;
+      background: #f8fafc;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+    }
+
+    .photo-card-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--mia-blue);
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #cbd5e1;
+      letter-spacing: 0.03em;
+    }
+
+    .photo-box {
+      width: 145px;
+      height: 170px;
+      margin: 0 auto;
+      background: #0f172a;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* object-fit: contain ensures 100% of the photo is visible without cropping */
+    .photo-frame {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .photo-meta {
+      margin-top: 6px;
+      text-align: left;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 5px 7px;
+      font-size: 0.76rem;
+      line-height: 1.35;
+      color: #0f172a;
+    }
+
+    .photo-meta div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .photo-meta strong {
+      color: #334155;
+    }
+
+    /* Info Table on Left */
+    .section-heading {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--mia-blue);
+      text-transform: uppercase;
+      border-bottom: 2px solid var(--mia-blue);
+      padding-bottom: 5px;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .info-table th,
+    .info-table td {
+      padding: 7px 11px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+      font-size: 0.86rem;
+      line-height: 1.35;
+    }
+
+    .info-table th {
+      width: 38%;
+      background: #f1f5f9;
+      color: #1e293b;
+      font-weight: 700;
+    }
+
+    .info-table td {
+      color: #0f172a;
+      font-weight: 600;
+      background: #ffffff;
+    }
+
+    .info-table tr.highlight-row th {
+      background: #eef2ff;
+      color: #1e3a8a;
+    }
+
+    .info-table tr.highlight-row td {
+      background: #f8fafc;
+      font-weight: 800;
+    }
+
+    /* Co-residents table */
+    .family-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-top: 6px;
+    }
+
+    .family-table th,
+    .family-table td {
+      padding: 6px 10px;
+      border: 1px solid #cbd5e1;
+      text-align: left;
+    }
+
+    .family-table th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Official Seal & Signature Block */
+    .official-sign-row {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px dashed #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: #334155;
+    }
+
+    .seal-badge {
+      border: 2px solid #1e3a8a;
+      color: #1e3a8a;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(30, 58, 138, 0.04);
+    }
+
+    .dossier-footer {
+      position: relative;
+      z-index: 1;
+      background: #091528;
+      color: #cbd5e1;
+      border-top: 2px solid var(--mia-gold);
+      padding: 10px 26px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .toolbar {
+        display: none !important;
+      }
+      .dossier-sheet {
+        box-shadow: none;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <a href="/" class="btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      ბაზაში დაბრუნება
+    </a>
+    <button onclick="window.print()" class="btn btn-gold">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      PDF შენახვა / ფაილის ბეჭდვა
+    </button>
+  </div>
+
+  <div class="dossier-sheet" id="dossierContent">
+    <img src="/logo.jpg" alt="" class="watermark" />
+
+    <div class="dossier-header">
+      <div class="header-left">
+        <img src="/logo.jpg" alt="შსს ლოგო" class="header-logo" />
+        <div class="header-titles">
+          <div class="sub-en">Ministry of Internal Affairs of Georgia</div>
+          <h1>საქართველოს შინაგან საქმეთა სამინისტრო</h1>
+          <p>ცენტრალური საინფორმაციო-ანალიტიკური დეპარტამენტი • პიროვნების სააღრიცხვო ფაილი</p>
+        </div>
+      </div>
+      <div class="header-stamp">
+        <div><strong>ფაილის #:</strong> <span id="docNum">MIA-0000</span></div>
+        <div><strong>გაცემის თარიღი:</strong> <span id="docDate">—</span></div>
+        <div class="classified">სამსახურებრივი სარგებლობისთვის</div>
+      </div>
+    </div>
+
+    <div class="dossier-body" id="dossierBody">
+      <p style="text-align: center; padding: 40px;">იტვირთება პიროვნების ფაილი...</p>
+    </div>
+
+    <div class="dossier-footer">
+      <div>საქართველოს შინაგან საქმეთა სამინისტრო • ერთიანი ელექტრონული ბაზა</div>
+      <div>ოფიციალური საინფორმაციო ამონაწერი</div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_AVATAR_MALE = "data:image/svg+xml;utf8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+        <rect width="200" height="240" fill="#101e36"/>
+        <circle cx="100" cy="82" r="42" fill="#334e7b"/>
+        <path d="M30 225 C30 162 170 162 170 225 Z" fill="#334e7b"/>
+        <text x="100" y="232" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="11">შსს ფოტო არქივი</text>
+      </svg>
+    `);
+
+    const DEFAULT_AVATAR_FEMALE = "data:image/svg+xml;utf8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+        <rect width="200" height="240" fill="#101e36"/>
+        <circle cx="100" cy="82" r="42" fill="#4c3d6e"/>
+        <path d="M35 225 C35 162 165 162 165 225 Z" fill="#4c3d6e"/>
+        <text x="100" y="232" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="11">შსს ფოტო არქივი</text>
+      </svg>
+    `);
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatDateGeo(raw) {
+      if (!raw) return '—';
+      const clean = raw.replace(' 00:00:00', '').trim();
+      const m = clean.match(/^(\d{2})\/(\d{2})\/(\d{2,4})$/);
+      if (!m) return clean;
+      let year = m[3];
+      if (year.length === 2) {
+        year = parseInt(year, 10) > 15 ? '19' + year : '20' + year;
+      }
+      return `${m[2]}.${m[1]}.${year} (${clean})`;
+    }
+
+    async function loadDossier() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      document.getElementById('docDate').textContent = new Date().toLocaleDateString('ka-GE');
+      if (!id) {
+        document.getElementById('dossierBody').innerHTML = '<p>პიროვნების ID მითითებული არ არის.</p>';
+        return;
+      }
+      document.getElementById('docNum').textContent = 'MIA-' + String(id).padStart(7, '0');
+
+      const res = await fetch('/api/person?id=' + encodeURIComponent(id));
+      const data = await res.json();
+      if (!data.person) {
+        document.getElementById('dossierBody').innerHTML = '<p>ჩანაწერი ვერ მოიძებნა.</p>';
+        return;
+      }
+
+      const p = data.person;
+      const personPhoto = p.photo_url || (String(p.sqesi) === '2' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE);
+      const fatherPhoto = p.father_photo_url || (data.likelyFather && data.likelyFather.photo_url) || DEFAULT_AVATAR_MALE;
+      const sqesiText = String(p.sqesi) === '1' ? 'მამრობითი (1)' : (String(p.sqesi) === '2' ? 'მდედრობითი (2)' : (p.sqesi || '—'));
+      const fatherFirstName = p.mamis_saxeli || (data.likelyFather && data.likelyFather.saxeli) || '—';
+      const fatherLastName = p.gvari || (data.likelyFather && data.likelyFather.gvari) || '—';
+
+      let html = `
+        <div class="doc-banner">
+          <span>სუბიექტი: ${escapeHtml(p.saxeli || '')} ${escapeHtml(p.gvari || '')} (პ/ნ: ${escapeHtml(p.piradi || '—')})</span>
+          <span>ბაზის ჩანაწერი: #${p.id}</span>
+        </div>
+
+        <div class="top-section">
+          <!-- Left Column: Full Detailed Data -->
+          <div>
+            <h3 class="section-heading">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              პერსონალური და სარეგისტრაციო მონაცემები
+            </h3>
+            <table class="info-table">
+              <tr class="highlight-row"><th>პირადი ნომერი (piadi #)</th><td style="font-family: monospace; font-size: 0.98rem;">${escapeHtml(p.piradi || '—')}</td></tr>
+              <tr class="highlight-row"><th>გვარი (gvari)</th><td>${escapeHtml(p.gvari || '—')}</td></tr>
+              <tr class="highlight-row"><th>სახელი (saxeli)</th><td>${escapeHtml(p.saxeli || '—')}</td></tr>
+              <tr class="highlight-row"><th>მამის სახელი</th><td>${escapeHtml(fatherFirstName)}</td></tr>
+              <tr class="highlight-row"><th>მამის გვარი</th><td>${escapeHtml(fatherLastName)}</td></tr>
+              <tr><th>დაბადების თარიღი (dab weli)</th><td>${escapeHtml(formatDateGeo(p.dab_weli))}</td></tr>
+              <tr><th>სქესი (sqesi)</th><td>${escapeHtml(sqesiText)}</td></tr>
+              <tr><th>მობილურის ნომერი</th><td style="color: #047857; font-weight: 800;">${escapeHtml(p.phone || 'არ არის მითითებული')}</td></tr>
+              <tr><th>იურიდიული მისამართი (quCa)</th><td>${escapeHtml(p.quca || '—')}</td></tr>
+              <tr><th>ფაქტობრივი მისამართი</th><td>${escapeHtml(p.actual_address || p.quca || '—')}</td></tr>
+              <tr><th>რაიონი / ქალაქი (raioni)</th><td>${escapeHtml(p.raioni || '—')}</td></tr>
+              <tr><th>მოწმობის ნომერი (mocmobis #)</th><td>${escapeHtml(p.mocmobis || '—')}</td></tr>
+              <tr><th>რეგისტრაციის თარიღი (reg TariRi)</th><td>${escapeHtml(formatDateGeo(p.reg_tarigi))}</td></tr>
+              <tr><th>დამატებითი კოდი (DMONAC)</th><td>${escapeHtml(p.dmonac || '—')}</td></tr>
+              <tr><th>სამუშაო ადგილი / პოზიცია</th><td>${escapeHtml(p.workplace || '—')}</td></tr>
+              <tr><th>ავტომობილი / სახ. ნომერი</th><td>${escapeHtml(p.vehicle || '—')}</td></tr>
+              <tr><th>სტატუსი</th><td>${escapeHtml(p.status_note || 'აქტიური ჩანაწერი')}</td></tr>
+              <tr><th>დამატებითი შენიშვნები</th><td>${escapeHtml(p.notes || '—')}</td></tr>
+            </table>
+          </div>
+
+          <!-- Right Column: Smaller Uncropped Photos -->
+          <div class="photos-column">
+            <div class="photo-card">
+              <div class="photo-card-title">პიროვნების ფოტო</div>
+              <div class="photo-box">
+                <img src="${escapeHtml(personPhoto)}" class="photo-frame" alt="პიროვნების ფოტო" />
+              </div>
+              <div class="photo-meta">
+                <div><strong>სახელი:</strong> ${escapeHtml(p.saxeli || '—')}</div>
+                <div><strong>გვარი:</strong> ${escapeHtml(p.gvari || '—')}</div>
+                <div><strong>პ/ნ:</strong> ${escapeHtml(p.piradi || '—')}</div>
+              </div>
+            </div>
+
+            <div class="photo-card">
+              <div class="photo-card-title">მამის ფოტო</div>
+              <div class="photo-box">
+                <img src="${escapeHtml(fatherPhoto)}" class="photo-frame" alt="მამის ფოტო" />
+              </div>
+              <div class="photo-meta">
+                <div><strong>სახელი:</strong> ${escapeHtml(fatherFirstName)}</div>
+                <div><strong>გვარი:</strong> ${escapeHtml(fatherLastName)}</div>
+                <div><strong>სტატუსი:</strong> მამა</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (data.coResidents && data.coResidents.length > 0) {
+        html += `
+          <h3 class="section-heading" style="margin-top: 10px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            ამავე მისამართზე და გვარზე რეგისტრირებული პირები (ოჯახის წევრები)
+          </h3>
+          <table class="family-table">
+            <thead>
+              <tr>
+                <th>პირადი #</th>
+                <th>გვარი</th>
+                <th>სახელი</th>
+                <th>მამის სახელი და გვარი</th>
+                <th>დაბ. თარიღი</th>
+                <th>მოწმობის #</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.coResidents.slice(0, 10).map(c => `
+                <tr>
+                  <td style="font-family: monospace;">${escapeHtml(c.piradi || '—')}</td>
+                  <td><strong>${escapeHtml(c.gvari || '—')}</strong></td>
+                  <td><strong>${escapeHtml(c.saxeli || '—')}</strong></td>
+                  <td>${escapeHtml(c.mamis_saxeli || '—')} ${escapeHtml(c.gvari || '')}</td>
+                  <td>${escapeHtml(formatDateGeo(c.dab_weli))}</td>
+                  <td>${escapeHtml(c.mocmobis || '—')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+
+      html += `
+        <div class="official-sign-row">
+          <div>ამონაწერი მომზადებულია შსს-ს ცენტრალური საინფორმაციო ბაზიდან</div>
+          <div class="seal-badge">შსს • დადასტურებულია ელექტრონულად</div>
+        </div>
+      `;
+
+      document.getElementById('dossierBody').innerHTML = html;
+    }
+
+    loadDossier();
+  </script>
+</body>
+</html>
