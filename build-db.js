@@ -6,7 +6,6 @@ const { DatabaseSync } = require('node:sqlite');
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_FILE = path.join(__dirname, 'baza.db');
 
-// AcadNusx to Georgian Mkhedruli mapping
 const ACAD_MAP = {
   'a': 'ა', 'b': 'ბ', 'g': 'გ', 'd': 'დ', 'e': 'ე', 'v': 'ვ', 'z': 'ზ',
   'T': 'თ', 'i': 'ი', 'k': 'კ', 'l': 'ლ', 'm': 'მ', 'n': 'ნ', 'o': 'ო',
@@ -107,7 +106,7 @@ async function buildDatabase() {
     process.exit(1);
   }
 
-  console.log(`Found ${partFiles.length} data part(s). Initializing SQLite database...`);
+  console.log(`Found ${partFiles.length} data part(s). Initializing SQLite database (low-memory mode)...`);
   const startTime = Date.now();
   const db = new DatabaseSync(DB_FILE);
 
@@ -115,9 +114,8 @@ async function buildDatabase() {
     PRAGMA page_size = 4096;
     PRAGMA journal_mode = OFF;
     PRAGMA synchronous = OFF;
-    PRAGMA locking_mode = EXCLUSIVE;
-    PRAGMA temp_store = MEMORY;
-    PRAGMA cache_size = -500000;
+    PRAGMA cache_size = -32000;
+    PRAGMA temp_store = FILE;
 
     CREATE TABLE records (
       id INTEGER PRIMARY KEY,
@@ -196,7 +194,7 @@ async function buildDatabase() {
           toGeorgian(cols[10])
         );
 
-        if (rowId % 500000 === 0) {
+        if (rowId % 100000 === 0) {
           db.exec('COMMIT');
           console.log(`Imported ${rowId.toLocaleString()} rows...`);
           db.exec('BEGIN');

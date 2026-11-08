@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "node build-db.js"
+    "build": "echo 'Build ready'"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -16,8 +16,5 @@
     "sqlite"
   ],
   "author": "lucaskawaiii",
-  "license": "ISC",
-  "dependencies": {
-    "isomorphic-git": "^1.44.11"
-  }
+  "license": "ISC"
 }
