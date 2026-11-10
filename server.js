@@ -230,7 +230,7 @@ function parseSearchParams(searchParams) {
   let mamis_saxeli = ensureGeorgian(searchParams.get('mamis_saxeli') || '');
   let piradi = (searchParams.get('piradi') || '').trim();
   let mocmobis = (searchParams.get('mocmobis') || '').trim();
-  let quca = ensureGeorgian(searchParams.get('quca') || '');
+  let quca = (searchParams.get('quca') || '').trim();
   let raioni = ensureGeorgian(searchParams.get('raioni') || '');
   let dab_weli = (searchParams.get('dab_weli') || '').trim();
   let sqesi = (searchParams.get('sqesi') || '').trim();
@@ -294,29 +294,30 @@ function executeSearch(params) {
   const extraSql = extraWhere.length > 0 ? ' AND ' + extraWhere.join(' AND ') : '';
 
   if (!gvari && !saxeli && !q && quca) {
+    const geoQuca = ensureGeorgian(quca);
     let rows = db.prepare(`
       SELECT * FROM records
-      WHERE quca = ?
+      WHERE quca = ? OR quca = ?
       ORDER BY gvari ASC, dab_weli ASC
       LIMIT ? OFFSET ?
-    `).all(quca, limit, offset);
+    `).all(quca, geoQuca, limit, offset);
 
     if (rows.length === 0 && offset === 0) {
       rows = db.prepare(`
         SELECT * FROM records
-        WHERE quca >= ? AND quca < ?
+        WHERE (quca >= ? AND quca < ?) OR (quca >= ? AND quca < ?)
         ORDER BY quca ASC, gvari ASC
         LIMIT ? OFFSET ?
-      `).all(quca, quca + '\uffff', limit, offset);
+      `).all(quca, quca + '\uffff', geoQuca, geoQuca + '\uffff', limit, offset);
     }
 
     if (rows.length === 0 && offset === 0) {
       rows = db.prepare(`
         SELECT * FROM records
-        WHERE quca LIKE ?
+        WHERE quca LIKE ? OR quca LIKE ?
         ORDER BY gvari ASC
         LIMIT ? OFFSET ?
-      `).all('%' + quca + '%', limit, offset);
+      `).all('%' + quca + '%', '%' + geoQuca + '%', limit, offset);
     }
 
     return {
@@ -1006,23 +1007,33 @@ const server = http.createServer(async (req, res) => {
         return sendJson(401, { ok: false, error: 'ავტორიზაცია აუცილებელია' });
       }
       const rawQuca = (parsedUrl.searchParams.get('quca') || '').trim();
-      const quca = ensureGeorgian(rawQuca);
       const excludeId = parseInt(parsedUrl.searchParams.get('excludeId') || '0', 10);
 
-      if (!quca || quca.length < 3 || quca.toLowerCase().includes('misamartis garese') || quca.includes('მისამართის გარეშე')) {
+      if (!rawQuca || rawQuca.length < 3 || rawQuca.toLowerCase().includes('misamartis garese') || rawQuca.includes('მისამართის გარეშე')) {
         return sendJson(200, { ok: true, residents: [], total: 0 });
       }
 
-      const rows = db.prepare(`
+      const geoQuca = ensureGeorgian(rawQuca);
+      let rows = db.prepare(`
         SELECT id, piradi, gvari, saxeli, mamis_saxeli, dab_weli, sqesi, mocmobis, quca, raioni
         FROM records
-        WHERE quca = ? AND id != ?
+        WHERE (quca = ? OR quca = ?) AND id != ?
         ORDER BY gvari ASC, dab_weli ASC
         LIMIT 200
-      `).all(quca, excludeId);
+      `).all(rawQuca, geoQuca, excludeId);
+
+      if (rows.length === 0) {
+        rows = db.prepare(`
+          SELECT id, piradi, gvari, saxeli, mamis_saxeli, dab_weli, sqesi, mocmobis, quca, raioni
+          FROM records
+          WHERE (quca LIKE ? OR quca LIKE ?) AND id != ?
+          ORDER BY gvari ASC, dab_weli ASC
+          LIMIT 200
+        `).all('%' + rawQuca + '%', '%' + geoQuca + '%', excludeId);
+      }
 
       const enriched = attachExtrasToRows(rows);
-      return sendJson(200, { ok: true, residents: enriched, total: enriched.length, quca });
+      return sendJson(200, { ok: true, residents: enriched, total: enriched.length, quca: rawQuca });
     }
 
     // API: Face / Camera Biometric Recognition Search
