@@ -134,21 +134,37 @@ function getSession(req) {
   return activeSessions.get(token) || null;
 }
 
-// AcadNusx to Georgian helper
-const ACAD_MAP = {
-  'a': 'ა', 'b': 'ბ', 'g': 'გ', 'd': 'დ', 'e': 'ე', 'ვ': 'v', 'ზ': 'z',
-  'T': 'თ', 'i': 'ი', 'k': 'კ', 'l': 'ლ', 'm': 'მ', 'n': 'ნ', 'o': 'ო',
-  'p': 'პ', 'J': 'ჟ', 'r': 'რ', 's': 'ს', 't': 'ტ', 'u': 'უ', 'f': 'ფ',
-  'q': 'ქ', 'R': 'ღ', 'y': 'ყ', 'S': 'შ', 'C': 'ჩ', 'c': 'ც', 'Z': 'ძ',
-  'w': 'წ', 'W': 'ჭ', 'x': 'ხ', 'j': 'ჯ', 'h': 'ჰ'
+// Georgian QWERTY keyboard and phonetic Latin transliteration map
+const GEO_QWERTY_MAP = {
+  'a': 'ა', 'b': 'ბ', 'g': 'გ', 'd': 'დ', 'e': 'ე', 'v': 'ვ', 'z': 'ზ',
+  't': 'ტ', 'T': 'თ', 'i': 'ი', 'k': 'კ', 'l': 'ლ', 'm': 'მ', 'n': 'ნ',
+  'o': 'ო', 'p': 'პ', 'j': 'ჯ', 'J': 'ჟ', 'r': 'რ', 's': 'ს', 'S': 'შ',
+  'u': 'უ', 'f': 'ფ', 'q': 'ქ', 'R': 'ღ', 'y': 'ყ', 'c': 'ც', 'C': 'ჩ',
+  'Z': 'ძ', 'w': 'წ', 'W': 'ჭ', 'x': 'ხ', 'h': 'ჰ'
 };
 
 function ensureGeorgian(str) {
   if (!str) return '';
+  // Multi-letter digraph conversion for Latin input
+  let s = String(str)
+    .replace(/sh/gi, 'შ')
+    .replace(/ch/gi, 'ჩ')
+    .replace(/zh/gi, 'ჟ')
+    .replace(/kh/gi, 'ხ')
+    .replace(/gh/gi, 'ღ')
+    .replace(/dz/gi, 'ძ')
+    .replace(/ts/gi, 'ც');
+
   let out = '';
-  for (let i = 0; i < str.length; i++) {
-    const ch = str[i];
-    out += ACAD_MAP[ch] || ch;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    const code = ch.charCodeAt(0);
+    // If already Georgian Mkhedruli (0x10D0 to 0x10FA), NEVER modify it!
+    if (code >= 0x10D0 && code <= 0x10FA) {
+      out += ch;
+    } else {
+      out += GEO_QWERTY_MAP[ch] || GEO_QWERTY_MAP[ch.toLowerCase()] || ch;
+    }
   }
   return out.trim();
 }
@@ -381,40 +397,50 @@ function executeSearch(params) {
     if (tokens.length >= 2) {
       const t1 = tokens[0];
       const t2 = tokens[1];
-      const t1Vars = getNameVariants(t1);
-      const t2Vars = getNameVariants(t2);
+      const t3 = tokens[2] || '';
 
-      const t2Placeholders = t2Vars.map(() => '?').join(',');
-      const sql1 = `
+      // Direct match on both name/surname orderings
+      let rows = db.prepare(`
         SELECT * FROM records
-        WHERE gvari = ? AND saxeli IN (${t2Placeholders}) ${extraSql}
+        WHERE ((gvari = ? AND saxeli = ?) OR (saxeli = ? AND gvari = ?)) ${extraSql}
         LIMIT ? OFFSET ?
-      `;
-      let rows = db.prepare(sql1).all(t1, ...t2Vars, ...extraArgs, limit, offset);
+      `).all(t1, t2, t1, t2, ...extraArgs, limit, offset);
 
-      if (rows.length === 0 && offset === 0) {
-        const t1Placeholders = t1Vars.map(() => '?').join(',');
-        const sql2 = `
+      // If patronymic was also included as 3rd token
+      if (rows.length === 0 && t3) {
+        rows = db.prepare(`
           SELECT * FROM records
-          WHERE gvari = ? AND saxeli IN (${t1Placeholders}) ${extraSql}
+          WHERE ((gvari = ? AND saxeli = ?) OR (saxeli = ? AND gvari = ?))
+            AND (mamis_saxeli LIKE ?) ${extraSql}
           LIMIT ? OFFSET ?
-        `;
-        rows = db.prepare(sql2).all(t2, ...t1Vars, ...extraArgs, limit, offset);
+        `).all(t1, t2, t1, t2, t3 + '%', ...extraArgs, limit, offset);
       }
 
+      // Try with name variants (stem / suffix)
       if (rows.length === 0 && offset === 0) {
-        const t1Stem = t1Vars[t1Vars.length - 1];
-        const t2Stem = t2Vars[t2Vars.length - 1];
-        const sql3 = `
+        const t1Vars = getNameVariants(t1);
+        const t2Vars = getNameVariants(t2);
+        const t1In = t1Vars.map(() => '?').join(',');
+        const t2In = t2Vars.map(() => '?').join(',');
+        rows = db.prepare(`
           SELECT * FROM records
-          WHERE (gvari >= ? AND gvari < ? AND saxeli >= ? AND saxeli < ?)
-             OR (gvari >= ? AND gvari < ? AND saxeli >= ? AND saxeli < ?)
+          WHERE ((gvari IN (${t1In}) AND saxeli IN (${t2In}))
+             OR (gvari IN (${t2In}) AND saxeli IN (${t1In}))) ${extraSql}
+          LIMIT ? OFFSET ?
+        `).all(...t1Vars, ...t2Vars, ...t2Vars, ...t1Vars, ...extraArgs, limit, offset);
+      }
+
+      // Try index prefix ranges
+      if (rows.length === 0 && offset === 0) {
+        rows = db.prepare(`
+          SELECT * FROM records
+          WHERE ((gvari >= ? AND gvari < ? AND saxeli >= ? AND saxeli < ?)
+             OR (gvari >= ? AND gvari < ? AND saxeli >= ? AND saxeli < ?))
              ${extraSql}
           LIMIT ? OFFSET ?
-        `;
-        rows = db.prepare(sql3).all(
-          t1Stem, t1Stem + '\uffff', t2Stem, t2Stem + '\uffff',
-          t2Stem, t2Stem + '\uffff', t1Stem, t1Stem + '\uffff',
+        `).all(
+          t1, t1 + '\uffff', t2, t2 + '\uffff',
+          t2, t2 + '\uffff', t1, t1 + '\uffff',
           ...extraArgs, limit, offset
         );
       }
@@ -425,21 +451,19 @@ function executeSearch(params) {
       const wVars = getNameVariants(word);
       const wPlaceholders = wVars.map(() => '?').join(',');
 
-      const sql = `
+      let rows = db.prepare(`
         SELECT * FROM records
         WHERE (gvari = ? OR saxeli IN (${wPlaceholders})) ${extraSql}
         LIMIT ? OFFSET ?
-      `;
-      let rows = db.prepare(sql).all(word, ...wVars, ...extraArgs, limit, offset);
+      `).all(word, ...wVars, ...extraArgs, limit, offset);
 
       if (rows.length === 0 && offset === 0) {
         const wStem = wVars[wVars.length - 1];
-        const sqlPref = `
+        rows = db.prepare(`
           SELECT * FROM records
           WHERE (gvari >= ? AND gvari < ?) OR (saxeli >= ? AND saxeli < ?) ${extraSql}
           LIMIT ? OFFSET ?
-        `;
-        rows = db.prepare(sqlPref).all(
+        `).all(
           wStem, wStem + '\uffff',
           wStem, wStem + '\uffff',
           ...extraArgs, limit, offset
