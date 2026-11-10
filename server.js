@@ -26,7 +26,7 @@ if (!fs.existsSync(DB_PATH)) {
   }
 }
 
-// Open database in read-write mode so admin can add/edit photos, phones, addresses, etc.
+// Open database in read-write mode
 const db = new DatabaseSync(DB_PATH);
 db.exec('PRAGMA cache_size = -100000;');
 db.exec('PRAGMA temp_store = MEMORY;');
@@ -48,14 +48,63 @@ db.exec(`
   );
 `);
 
+// Create system_users table for authentication and user management (Standard, Premium, Admin)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS system_users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE COLLATE NOCASE,
+    password_hash TEXT NOT NULL,
+    salt TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'standard',
+    display_name TEXT DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT DEFAULT '',
+    created_by TEXT DEFAULT '',
+    notes TEXT DEFAULT ''
+  );
+`);
+
+function hashPassword(password, salt) {
+  return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+}
+
+function verifyPassword(password, salt, storedHash) {
+  const hash = hashPassword(password, salt);
+  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(storedHash, 'hex'));
+}
+
+// Ensure default administrator account exists
+function ensureDefaultUsers() {
+  const adminRow = db.prepare('SELECT id FROM system_users WHERE username = ?').get('lucasmshvidobadze');
+  if (!adminRow) {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = hashPassword('Argo226', salt);
+    db.prepare(`
+      INSERT INTO system_users (username, password_hash, salt, role, display_name, status, created_at, created_by, notes)
+      VALUES (?, ?, ?, 'admin', 'ლუკას მშვიდობაძე', 'active', ?, 'system', 'მთავარი ადმინისტრატორი')
+    `).run('lucasmshvidobadze', hash, salt, new Date().toISOString());
+    console.log('Seeded primary admin user: lucasmshvidobadze');
+  }
+
+  // Also seed legacy admin if not present
+  const legacyRow = db.prepare('SELECT id FROM system_users WHERE username = ?').get('lucaskawaiii');
+  if (!legacyRow) {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = hashPassword('Argo226', salt);
+    db.prepare(`
+      INSERT INTO system_users (username, password_hash, salt, role, display_name, status, created_at, created_by, notes)
+      VALUES (?, ?, ?, 'admin', 'Lucas Kawaii', 'active', ?, 'system', 'ადმინისტრატორი')
+    `).run('lucaskawaiii', hash, salt, new Date().toISOString());
+  }
+}
+ensureDefaultUsers();
+
 let maxIdRow = db.prepare('SELECT MAX(id) as total FROM records').get();
 let TOTAL_RECORDS = maxIdRow && maxIdRow.total ? maxIdRow.total : 0;
 console.log(`Loaded MIA database with ${TOTAL_RECORDS.toLocaleString()} records.`);
 
-// Admin credentials & active session tokens
-const VALID_USERS = new Set(['lucaskawaiii', 'lucaskawaii']);
-const VALID_PASSES = new Set(['Argo226', 'argo226']);
-const activeTokens = new Set();
+// Active Sessions map: token -> { id, username, role, displayName, loginTime }
+const activeSessions = new Map();
 
 // Map Georgian QWERTY characters back to Latin in case keyboard layout is Georgian during login
 const GEO_TO_LATIN = {
@@ -75,14 +124,19 @@ function normalizeLoginString(str) {
   return out;
 }
 
-function isValidToken(req) {
-  const auth = req.headers['x-admin-token'] || '';
-  return activeTokens.has(auth);
+function getSession(req) {
+  let token = req.headers['x-auth-token'] || req.headers['x-admin-token'] || '';
+  if (!token && req.headers['authorization']) {
+    const match = req.headers['authorization'].match(/^Bearer\s+(.+)$/i);
+    if (match) token = match[1];
+  }
+  if (!token) return null;
+  return activeSessions.get(token) || null;
 }
 
 // AcadNusx to Georgian helper
 const ACAD_MAP = {
-  'a': 'ა', 'b': 'ბ', 'g': 'გ', 'd': 'დ', 'e': 'ე', 'v': 'ვ', 'z': 'ზ',
+  'a': 'ა', 'b': 'ბ', 'g': 'გ', 'd': 'დ', 'e': 'ე', 'ვ': 'v', 'ზ': 'z',
   'T': 'თ', 'i': 'ი', 'k': 'კ', 'l': 'ლ', 'm': 'მ', 'n': 'ნ', 'o': 'ო',
   'p': 'პ', 'J': 'ჟ', 'r': 'რ', 's': 'ს', 't': 'ტ', 'u': 'უ', 'f': 'ფ',
   'q': 'ქ', 'R': 'ღ', 'y': 'ყ', 'S': 'შ', 'C': 'ჩ', 'c': 'ც', 'Z': 'ძ',
@@ -297,102 +351,103 @@ function executeSearch(params) {
   }
 
   if (q) {
-    // Check if search is by #ID (e.g. "#23")
-    if (/^#\d+$/.test(q)) {
-      const idNum = parseInt(q.slice(1), 10);
-      const rows = db.prepare('SELECT * FROM records WHERE id = ?').all(idNum);
-      return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
+    if (q.startsWith('#')) {
+      const idNum = parseInt(q.slice(1).trim(), 10);
+      if (!isNaN(idNum) && idNum > 0) {
+        const row = db.prepare('SELECT * FROM records WHERE id = ?').get(idNum);
+        return {
+          rows: row ? attachExtrasToRows([row]) : [],
+          elapsedMs: Date.now() - t0
+        };
+      }
     }
 
-    const tokens = q.split(/\s+/).filter(Boolean);
-
-    if (tokens.length === 1) {
-      const tok = tokens[0];
-      if (/^\d+$/.test(tok)) {
-        // Also check if phone matches in person_extras
-        const extraPhoneRows = db.prepare('SELECT record_id FROM person_extras WHERE phone LIKE ? LIMIT 20').all('%' + tok + '%');
-        if (extraPhoneRows.length > 0 && tok.length < 11) {
-          const ids = extraPhoneRows.map(r => r.record_id);
-          const rows = db.prepare(`SELECT * FROM records WHERE id IN (${ids.map(() => '?').join(',')})`).all(...ids);
-          if (rows.length > 0) {
-            return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
-          }
+    if (/^\d{5,15}$/.test(q)) {
+      if (q.length === 11) {
+        const row = db.prepare('SELECT * FROM records WHERE piradi = ?').get(q);
+        if (row) {
+          return { rows: attachExtrasToRows([row]), elapsedMs: Date.now() - t0 };
         }
-
-        const sql = tok.length === 11
-          ? `SELECT * FROM records WHERE piradi = ? ${extraSql} LIMIT ? OFFSET ?`
-          : `SELECT * FROM records WHERE piradi >= ? AND piradi < ? ${extraSql} LIMIT ? OFFSET ?`;
-        const args = tok.length === 11
-          ? [tok, ...extraArgs, limit, offset]
-          : [tok, tok + '\uffff', ...extraArgs, limit, offset];
-        const rows = db.prepare(sql).all(...args);
+      }
+      const rows = db.prepare('SELECT * FROM records WHERE piradi LIKE ? LIMIT ? OFFSET ?').all(q + '%', limit, offset);
+      if (rows.length > 0) {
         return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
       }
+    }
 
-      const geoTok = ensureGeorgian(tok);
-      const vars = getNameVariants(geoTok);
-      const vPlaceholders = vars.map(() => '?').join(',');
+    const geoQ = ensureGeorgian(q);
+    const tokens = geoQ.split(/\s+/).filter(Boolean);
 
-      const sqlGvari = `SELECT * FROM records WHERE gvari = ? ${extraSql} LIMIT ? OFFSET ?`;
-      let rows = db.prepare(sqlGvari).all(geoTok, ...extraArgs, limit, offset);
+    if (tokens.length >= 2) {
+      const t1 = tokens[0];
+      const t2 = tokens[1];
+      const t1Vars = getNameVariants(t1);
+      const t2Vars = getNameVariants(t2);
 
-      if (rows.length === 0) {
-        const sqlSaxeli = `SELECT * FROM records WHERE saxeli IN (${vPlaceholders}) ${extraSql} LIMIT ? OFFSET ?`;
-        rows = db.prepare(sqlSaxeli).all(...vars, ...extraArgs, limit, offset);
+      const t2Placeholders = t2Vars.map(() => '?').join(',');
+      const sql1 = `
+        SELECT * FROM records
+        WHERE gvari = ? AND saxeli IN (${t2Placeholders}) ${extraSql}
+        LIMIT ? OFFSET ?
+      `;
+      let rows = db.prepare(sql1).all(t1, ...t2Vars, ...extraArgs, limit, offset);
+
+      if (rows.length === 0 && offset === 0) {
+        const t1Placeholders = t1Vars.map(() => '?').join(',');
+        const sql2 = `
+          SELECT * FROM records
+          WHERE gvari = ? AND saxeli IN (${t1Placeholders}) ${extraSql}
+          LIMIT ? OFFSET ?
+        `;
+        rows = db.prepare(sql2).all(t2, ...t1Vars, ...extraArgs, limit, offset);
       }
 
       if (rows.length === 0 && offset === 0) {
-        const sqlPrefix = `SELECT * FROM records WHERE gvari >= ? AND gvari < ? ${extraSql} LIMIT ? OFFSET ?`;
-        rows = db.prepare(sqlPrefix).all(geoTok, geoTok + '\uffff', ...extraArgs, limit, offset);
+        const t1Stem = t1Vars[t1Vars.length - 1];
+        const t2Stem = t2Vars[t2Vars.length - 1];
+        const sql3 = `
+          SELECT * FROM records
+          WHERE (gvari >= ? AND gvari < ? AND saxeli >= ? AND saxeli < ?)
+             OR (gvari >= ? AND gvari < ? AND saxeli >= ? AND saxeli < ?)
+             ${extraSql}
+          LIMIT ? OFFSET ?
+        `;
+        rows = db.prepare(sql3).all(
+          t1Stem, t1Stem + '\uffff', t2Stem, t2Stem + '\uffff',
+          t2Stem, t2Stem + '\uffff', t1Stem, t1Stem + '\uffff',
+          ...extraArgs, limit, offset
+        );
+      }
+
+      return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
+    } else if (tokens.length === 1) {
+      const word = tokens[0];
+      const wVars = getNameVariants(word);
+      const wPlaceholders = wVars.map(() => '?').join(',');
+
+      const sql = `
+        SELECT * FROM records
+        WHERE (gvari = ? OR saxeli IN (${wPlaceholders})) ${extraSql}
+        LIMIT ? OFFSET ?
+      `;
+      let rows = db.prepare(sql).all(word, ...wVars, ...extraArgs, limit, offset);
+
+      if (rows.length === 0 && offset === 0) {
+        const wStem = wVars[wVars.length - 1];
+        const sqlPref = `
+          SELECT * FROM records
+          WHERE (gvari >= ? AND gvari < ?) OR (saxeli >= ? AND saxeli < ?) ${extraSql}
+          LIMIT ? OFFSET ?
+        `;
+        rows = db.prepare(sqlPref).all(
+          wStem, wStem + '\uffff',
+          wStem, wStem + '\uffff',
+          ...extraArgs, limit, offset
+        );
       }
 
       return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
     }
-
-    const t1 = ensureGeorgian(tokens[0]);
-    const t2 = ensureGeorgian(tokens[1]);
-    const t3 = tokens[2] ? ensureGeorgian(tokens[2]) : '';
-
-    const v1 = getNameVariants(t1);
-    const v2 = getNameVariants(t2);
-    const v3 = t3 ? getNameVariants(t3) : [];
-
-    let mSql = '';
-    let mArgs = [];
-    if (v3.length > 0) {
-      mSql = ` AND mamis_saxeli IN (${v3.map(() => '?').join(',')})`;
-      mArgs = v3;
-    }
-
-    const sqlBoth = `
-      SELECT * FROM records
-      WHERE gvari = ? AND saxeli IN (${v1.map(() => '?').join(',')}) ${mSql} ${extraSql}
-      UNION
-      SELECT * FROM records
-      WHERE gvari = ? AND saxeli IN (${v2.map(() => '?').join(',')}) ${mSql} ${extraSql}
-      LIMIT ? OFFSET ?
-    `;
-    let rows = db.prepare(sqlBoth).all(
-      t2, ...v1, ...mArgs, ...extraArgs,
-      t1, ...v2, ...mArgs, ...extraArgs,
-      limit, offset
-    );
-
-    if (rows.length === 0 && offset === 0) {
-      const s1Stem = v1[v1.length - 1];
-      const s2Stem = v2[v2.length - 1];
-      const sqlPrefix1 = `
-        SELECT * FROM records
-        WHERE gvari >= ? AND gvari < ? AND saxeli >= ? AND saxeli < ? ${extraSql}
-        LIMIT ? OFFSET ?
-      `;
-      rows = db.prepare(sqlPrefix1).all(t2, t2 + '\uffff', s1Stem, s1Stem + '\uffff', ...extraArgs, limit, offset);
-      if (rows.length === 0) {
-        rows = db.prepare(sqlPrefix1).all(t1, t1 + '\uffff', s2Stem, s2Stem + '\uffff', ...extraArgs, limit, offset);
-      }
-    }
-
-    return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
   }
 
   if (extraWhere.length > 0) {
@@ -450,31 +505,220 @@ const server = http.createServer(async (req, res) => {
     const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     const pathname = parsedUrl.pathname;
 
-    // API: Admin Login
-    if (pathname === '/api/admin/login' && req.method === 'POST') {
+    // Helper: JSON response
+    const sendJson = (status, data) => {
+      res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify(data));
+    };
+
+    // ==========================================
+    // AUTHENTICATION APIs
+    // ==========================================
+
+    // API: User / Admin Login (Gatekeeper & Admin)
+    if ((pathname === '/api/auth/login' || pathname === '/api/admin/login') && req.method === 'POST') {
       const body = await readJsonBody(req);
       const rawUser = (body.username || '').trim();
       const rawPass = (body.password || '').trim();
       const normUser = normalizeLoginString(rawUser).toLowerCase();
       const normPass = normalizeLoginString(rawPass);
-      if (VALID_USERS.has(normUser) && (VALID_PASSES.has(rawPass) || VALID_PASSES.has(normPass))) {
-        const token = crypto.randomBytes(24).toString('hex');
-        activeTokens.add(token);
-        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ ok: true, token }));
-      } else {
-        res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ ok: false, error: 'არასწორი მომხმარებელი ან პაროლი!' }));
+
+      const user = db.prepare('SELECT * FROM system_users WHERE username = ? OR username = ?').get(rawUser, normUser);
+      if (!user) {
+        return sendJson(401, { ok: false, error: 'არასწორი მომხმარებელი ან პაროლი!' });
       }
-      return;
+
+      if (user.status !== 'active') {
+        return sendJson(403, { ok: false, error: 'თქვენი ანგარიში დაბლოკილია! მიმართეთ ადმინისტრატორს.' });
+      }
+
+      let match = false;
+      try {
+        match = verifyPassword(rawPass, user.salt, user.password_hash) ||
+                verifyPassword(normPass, user.salt, user.password_hash);
+      } catch (e) {
+        match = false;
+      }
+
+      if (!match) {
+        return sendJson(401, { ok: false, error: 'არასწორი მომხმარებელი ან პაროლი!' });
+      }
+
+      const token = crypto.randomBytes(32).toString('hex');
+      const sessionData = {
+        id: user.id,
+        username: user.username,
+        role: user.role, // 'admin', 'premium', 'standard'
+        displayName: user.display_name || user.username,
+        loginTime: Date.now()
+      };
+      activeSessions.set(token, sessionData);
+
+      return sendJson(200, {
+        ok: true,
+        token,
+        user: {
+          id: sessionData.id,
+          username: sessionData.username,
+          role: sessionData.role,
+          displayName: sessionData.displayName
+        }
+      });
     }
+
+    // API: Check current session (/api/auth/me)
+    if (pathname === '/api/auth/me') {
+      const session = getSession(req);
+      if (!session) {
+        return sendJson(401, { ok: false, error: 'სესია არ არის აქტიური' });
+      }
+      return sendJson(200, { ok: true, user: session });
+    }
+
+    // API: Logout
+    if (pathname === '/api/auth/logout' && req.method === 'POST') {
+      let token = req.headers['x-auth-token'] || req.headers['x-admin-token'] || '';
+      if (token) activeSessions.delete(token);
+      return sendJson(200, { ok: true });
+    }
+
+    // ==========================================
+    // ADMIN USER MANAGEMENT APIs (Role 'admin' required)
+    // ==========================================
+
+    // API: Get all system users
+    if (pathname === '/api/admin/users' && req.method === 'GET') {
+      const session = getSession(req);
+      if (!session || session.role !== 'admin') {
+        return sendJson(403, { ok: false, error: 'ადმინისტრატორის უფლებები აუცილებელია!' });
+      }
+      const users = db.prepare(`
+        SELECT id, username, role, display_name, status, created_at, created_by, notes
+        FROM system_users
+        ORDER BY id ASC
+      `).all();
+      return sendJson(200, { ok: true, users });
+    }
+
+    // API: Create new system user (Premium, Standard, Admin)
+    if (pathname === '/api/admin/users/create' && req.method === 'POST') {
+      const session = getSession(req);
+      if (!session || session.role !== 'admin') {
+        return sendJson(403, { ok: false, error: 'ადმინისტრატორის უფლებები აუცილებელია!' });
+      }
+      const body = await readJsonBody(req);
+      const rawUser = (body.username || '').trim();
+      const username = normalizeLoginString(rawUser).toLowerCase();
+      const rawPassword = (body.password || '').trim();
+      const role = ['admin', 'premium', 'standard'].includes(body.role) ? body.role : 'standard';
+      const displayName = ensureGeorgian(body.display_name || '').trim() || username;
+      const notes = ensureGeorgian(body.notes || '').trim();
+
+      if (!username || username.length < 3) {
+        return sendJson(400, { ok: false, error: 'მომხმარებლის სახელი უნდა შედგებოდეს მინიმუმ 3 სიმბოლოსგან!' });
+      }
+      if (!rawPassword || rawPassword.length < 4) {
+        return sendJson(400, { ok: false, error: 'პაროლი უნდა იყოს მინიმუმ 4 სიმბოლო!' });
+      }
+
+      const existing = db.prepare('SELECT id FROM system_users WHERE username = ?').get(username);
+      if (existing) {
+        return sendJson(400, { ok: false, error: `მომხმარებელი სახელით "${username}" უკვე არსებობს!` });
+      }
+
+      const salt = crypto.randomBytes(16).toString('hex');
+      const password_hash = hashPassword(rawPassword, salt);
+      const createdAt = new Date().toISOString();
+
+      const info = db.prepare(`
+        INSERT INTO system_users (username, password_hash, salt, role, display_name, status, created_at, created_by, notes)
+        VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?)
+      `).run(username, password_hash, salt, role, displayName, createdAt, session.username, notes);
+
+      return sendJson(200, {
+        ok: true,
+        user: {
+          id: Number(info.lastInsertRowid),
+          username,
+          role,
+          display_name: displayName,
+          status: 'active',
+          created_at: createdAt,
+          notes
+        }
+      });
+    }
+
+    // API: Toggle user status (Active / Blocked)
+    if (pathname === '/api/admin/users/toggle-status' && req.method === 'POST') {
+      const session = getSession(req);
+      if (!session || session.role !== 'admin') {
+        return sendJson(403, { ok: false, error: 'ადმინისტრატორის უფლებები აუცილებელია!' });
+      }
+      const body = await readJsonBody(req);
+      const targetId = parseInt(body.id, 10);
+      const target = db.prepare('SELECT * FROM system_users WHERE id = ?').get(targetId);
+      if (!target) {
+        return sendJson(404, { ok: false, error: 'მომხმარებელი ვერ მოიძებნა!' });
+      }
+      if (target.username.toLowerCase() === 'lucasmshvidobadze') {
+        return sendJson(400, { ok: false, error: 'მთავარი ადმინისტრატორის დაბლოკვა შეუძლებელია!' });
+      }
+      const newStatus = target.status === 'active' ? 'blocked' : 'active';
+      db.prepare('UPDATE system_users SET status = ? WHERE id = ?').run(newStatus, targetId);
+      return sendJson(200, { ok: true, status: newStatus });
+    }
+
+    // API: Reset user password
+    if (pathname === '/api/admin/users/reset-password' && req.method === 'POST') {
+      const session = getSession(req);
+      if (!session || session.role !== 'admin') {
+        return sendJson(403, { ok: false, error: 'ადმინისტრატორის უფლებები აუცილებელია!' });
+      }
+      const body = await readJsonBody(req);
+      const targetId = parseInt(body.id, 10);
+      const newPassword = (body.password || '').trim();
+      if (!newPassword || newPassword.length < 4) {
+        return sendJson(400, { ok: false, error: 'ახალი პაროლი უნდა იყოს მინიმუმ 4 სიმბოლო!' });
+      }
+      const target = db.prepare('SELECT * FROM system_users WHERE id = ?').get(targetId);
+      if (!target) {
+        return sendJson(404, { ok: false, error: 'მომხმარებელი ვერ მოიძებნა!' });
+      }
+      const salt = crypto.randomBytes(16).toString('hex');
+      const password_hash = hashPassword(newPassword, salt);
+      db.prepare('UPDATE system_users SET password_hash = ?, salt = ? WHERE id = ?').run(password_hash, salt, targetId);
+      return sendJson(200, { ok: true });
+    }
+
+    // API: Delete user account
+    if (pathname === '/api/admin/users/delete' && req.method === 'POST') {
+      const session = getSession(req);
+      if (!session || session.role !== 'admin') {
+        return sendJson(403, { ok: false, error: 'ადმინისტრატორის უფლებები აუცილებელია!' });
+      }
+      const body = await readJsonBody(req);
+      const targetId = parseInt(body.id, 10);
+      const target = db.prepare('SELECT * FROM system_users WHERE id = ?').get(targetId);
+      if (!target) {
+        return sendJson(404, { ok: false, error: 'მომხმარებელი ვერ მოიძებნა!' });
+      }
+      if (target.username.toLowerCase() === 'lucasmshvidobadze') {
+        return sendJson(400, { ok: false, error: 'მთავარი ადმინისტრატორის წაშლა შეუძლებელია!' });
+      }
+      db.prepare('DELETE FROM system_users WHERE id = ?').run(targetId);
+      return sendJson(200, { ok: true });
+    }
+
+    // ==========================================
+    // ADMIN PERSON ENRICHMENT APIs
+    // ==========================================
 
     // API: Admin Save / Update Person (or Create New Person)
     if (pathname === '/api/admin/save-person' && req.method === 'POST') {
-      if (!isValidToken(req)) {
-        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ ok: false, error: 'არაავტორიზებული წვდომა' }));
-        return;
+      const session = getSession(req);
+      if (!session || session.role !== 'admin') {
+        return sendJson(403, { ok: false, error: 'ადმინისტრატორის უფლებები აუცილებელია!' });
       }
 
       const body = await readJsonBody(req);
@@ -495,9 +739,7 @@ const server = http.createServer(async (req, res) => {
       if (recordId > 0) {
         const existing = db.prepare('SELECT id FROM records WHERE id = ?').get(recordId);
         if (!existing) {
-          res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
-          res.end(JSON.stringify({ ok: false, error: 'ჩანაწერი ამ ID-ით ვერ მოიძებნა' }));
-          return;
+          return sendJson(404, { ok: false, error: 'ჩანაწერი ამ ID-ით ვერ მოიძებნა' });
         }
         db.prepare(`
           UPDATE records
@@ -550,17 +792,14 @@ const server = http.createServer(async (req, res) => {
       `).run(recordId, photoUrl, fatherPhotoUrl, phone, actual_address, workplace, vehicle, status_note, notes, updated_at);
 
       const updatedPerson = attachExtrasToRows([db.prepare('SELECT * FROM records WHERE id = ?').get(recordId)])[0];
-      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(JSON.stringify({ ok: true, person: updatedPerson }));
-      return;
+      return sendJson(200, { ok: true, person: updatedPerson });
     }
 
     // API: List modified/enriched records in Admin Panel
     if (pathname === '/api/admin/modified-list') {
-      if (!isValidToken(req)) {
-        res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ ok: false, error: 'არაავტორიზებული წვდომა' }));
-        return;
+      const session = getSession(req);
+      if (!session || session.role !== 'admin') {
+        return sendJson(403, { ok: false, error: 'ადმინისტრატორის უფლებები აუცილებელია!' });
       }
       const extras = db.prepare('SELECT record_id FROM person_extras ORDER BY updated_at DESC LIMIT 50').all();
       const ids = extras.map(e => e.record_id);
@@ -568,33 +807,53 @@ const server = http.createServer(async (req, res) => {
       if (ids.length > 0) {
         rows = db.prepare(`SELECT * FROM records WHERE id IN (${ids.map(() => '?').join(',')})`).all(...ids);
       }
-      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(JSON.stringify({ ok: true, rows: attachExtrasToRows(rows) }));
-      return;
+      return sendJson(200, { ok: true, rows: attachExtrasToRows(rows) });
     }
 
-    // API: Search
+    // ==========================================
+    // GENERAL PROTECTED APIs (Auth required)
+    // ==========================================
+
+    // API: Stats (requires auth)
+    if (pathname === '/api/stats') {
+      const session = getSession(req);
+      if (!session) {
+        return sendJson(401, { error: 'ავტორიზაცია აუცილებელია' });
+      }
+      return sendJson(200, { totalRecordsInDb: TOTAL_RECORDS, user: session });
+    }
+
+    // API: Search (requires auth)
     if (pathname === '/api/search') {
+      const session = getSession(req);
+      if (!session) {
+        return sendJson(401, { error: 'ავტორიზაცია აუცილებელია' });
+      }
       const params = parseSearchParams(parsedUrl.searchParams);
+      // Standard users limited to 50 results; Premium & Admin up to 500
+      if (session.role === 'standard') {
+        params.limit = Math.min(params.limit, 50);
+      }
       const result = executeSearch(params);
-      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(JSON.stringify({
+      return sendJson(200, {
         totalRecordsInDb: TOTAL_RECORDS,
         count: result.rows.length,
         elapsedMs: result.elapsedMs,
-        rows: result.rows
-      }));
-      return;
+        rows: result.rows,
+        userRole: session.role
+      });
     }
 
-    // API: Person Full Dossier
+    // API: Person Full Dossier (requires auth)
     if (pathname === '/api/person') {
+      const session = getSession(req);
+      if (!session) {
+        return sendJson(401, { error: 'ავტორიზაცია აუცილებელია' });
+      }
       const id = parseInt(parsedUrl.searchParams.get('id') || '0', 10);
       const rawPerson = db.prepare('SELECT * FROM records WHERE id = ?').get(id);
       if (!rawPerson) {
-        res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ error: 'ჩანაწერი ვერ მოიძებნა' }));
-        return;
+        return sendJson(404, { error: 'ჩანაწერი ვერ მოიძებნა' });
       }
 
       const person = attachExtrasToRows([rawPerson])[0];
@@ -615,12 +874,12 @@ const server = http.createServer(async (req, res) => {
         likelyFather = coResidents.find(c => fVars.has(c.saxeli) && String(c.sqesi) === '1') || null;
       }
 
-      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-      res.end(JSON.stringify({ person, coResidents, likelyFather }));
-      return;
+      return sendJson(200, { person, coResidents, likelyFather, userRole: session.role });
     }
 
-    // Serve static files
+    // ==========================================
+    // STATIC FILES
+    // ==========================================
     let filePath = pathname === '/' ? path.join(PUBLIC_DIR, 'index.html') : path.join(PUBLIC_DIR, pathname);
     if (!filePath.startsWith(PUBLIC_DIR)) {
       res.writeHead(403);

@@ -486,6 +486,13 @@
     }
 
     async function loadDossier() {
+      const token = localStorage.getItem('mia_auth_token');
+      if (!token) {
+        alert('ავტორიზაცია აუცილებელია! გთხოვთ გაიაროთ ავტორიზაცია მთავარ გვერდზე.');
+        window.location.href = '/';
+        return;
+      }
+
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
       document.getElementById('docDate').textContent = new Date().toLocaleDateString('ka-GE');
@@ -495,7 +502,24 @@
       }
       document.getElementById('docNum').textContent = 'MIA-' + String(id).padStart(7, '0');
 
-      const res = await fetch('/api/person?id=' + encodeURIComponent(id));
+      let res;
+      try {
+        res = await fetch('/api/person?id=' + encodeURIComponent(id), {
+          headers: { 'x-auth-token': token }
+        });
+      } catch (err) {
+        document.getElementById('dossierBody').innerHTML = '<p>სერვერთან კავშირის შეცდომა.</p>';
+        return;
+      }
+
+      if (res.status === 401) {
+        localStorage.removeItem('mia_auth_token');
+        localStorage.removeItem('mia_auth_user');
+        alert('სესია ამოიწურა ან არ გაქვთ წვდომის უფლება. გთხოვთ თავიდან გაიაროთ ავტორიზაცია.');
+        window.location.href = '/';
+        return;
+      }
+
       const data = await res.json();
       if (!data.person) {
         document.getElementById('dossierBody').innerHTML = '<p>ჩანაწერი ვერ მოიძებნა.</p>';

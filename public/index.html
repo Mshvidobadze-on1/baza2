@@ -4,23 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/jpeg" href="/logo.jpg" />
-  <title>შინაგან საქმეთა სამინისტრო — მონაცემთა ბაზა</title>
+  <title>შინაგან საქმეთა სამინისტრო — ერთიანი მონაცემთა ბაზა</title>
   <style>
     :root {
-      --bg: #08101f;
-      --surface: #111e36;
-      --surface-hover: #1a2d4d;
-      --surface-alt: #0c172b;
-      --border: #253b63;
-      --gold: #c9a354;
-      --gold-light: #e5c478;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --accent: #10b981;
+      --bg: #070e1b;
+      --surface: #0e192d;
+      --surface-hover: #152542;
+      --surface-card: #12203a;
+      --border: #1e3358;
+      --border-light: #2c497a;
+      --text: #f0f4f8;
+      --text-muted: #8ba2c4;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --gold: #c99c3a;
+      --gold-light: #e5be6b;
+      --gold-dark: #8c6a1e;
       --danger: #ef4444;
-      --radius: 12px;
+      --success: #10b981;
+      --purple: #8b5cf6;
     }
 
     * {
@@ -31,646 +33,203 @@
 
     body {
       font-family: "BPG Arial", "Sylfaen", "Segoe UI", system-ui, -apple-system, sans-serif;
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at 50% 0%, #15294e 0%, #08101f 65%);
+      background: var(--bg);
       color: var(--text);
-      line-height: 1.5;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
+    /* SVG Icons helper */
     .svg-icon {
       width: 18px;
       height: 18px;
-      stroke: currentColor;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
       stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
-      fill: none;
-      flex-shrink: 0;
     }
 
     .svg-icon-sm {
-      width: 15px;
-      height: 15px;
-      stroke: currentColor;
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
       stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
-      fill: none;
-      flex-shrink: 0;
     }
 
     .svg-icon-lg {
-      width: 22px;
-      height: 22px;
-      stroke: currentColor;
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
       stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
-      fill: none;
-      flex-shrink: 0;
     }
 
-    .container {
-      max-width: 1540px;
-      margin: 0 auto;
-      padding: 18px 24px 60px;
-    }
-
-    /* Official MIA Header */
-    .header {
-      background: linear-gradient(135deg, #0b172e 0%, #162c52 100%);
-      border: 1px solid var(--border);
-      border-bottom: 3px solid var(--gold);
-      border-radius: var(--radius);
-      padding: 18px 24px;
-      margin-bottom: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-    }
-
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      user-select: none;
-    }
-
-    .mia-logo {
-      width: 74px;
-      height: 74px;
-      object-fit: contain;
-      border-radius: 12px;
-      border: 2px solid var(--gold);
-      background: #0a1931;
-      cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
-    }
-
-    .mia-logo:active {
-      transform: scale(0.95);
-    }
-
-    .header-title h1 {
-      font-size: 1.65rem;
-      font-weight: 800;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      color: #ffffff;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-    }
-
-    .header-title p {
-      color: var(--gold-light);
-      font-size: 0.92rem;
-      font-weight: 600;
-      margin-top: 3px;
-      letter-spacing: 0.02em;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .stats-pill {
-      background: rgba(8, 16, 31, 0.75);
-      border: 1px solid var(--border);
-      padding: 9px 16px;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stats-pill strong {
-      color: var(--gold-light);
-      font-weight: 700;
-    }
-
-    .admin-status-badge {
-      display: none;
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid var(--accent);
-      color: #6ee7b7;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .admin-status-badge.visible {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    /* Search Panel */
-    .search-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
-    }
-
-    .quick-search-row {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .quick-input-wrap {
-      position: relative;
-      flex: 1;
-      display: flex;
-      align-items: center;
-    }
-
-    .quick-input-icon {
-      position: absolute;
-      left: 16px;
-      color: var(--gold-light);
-      pointer-events: none;
-    }
-
-    .quick-input {
-      width: 100%;
-      padding: 14px 18px 14px 46px;
-      font-size: 1.06rem;
-      background: var(--bg);
-      color: var(--text);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
-    .quick-input:focus {
-      border-color: var(--gold);
-    }
-
+    /* Buttons */
     .btn {
-      padding: 11px 22px;
-      font-size: 0.95rem;
+      padding: 10px 18px;
+      border-radius: 8px;
       font-weight: 700;
-      border: none;
-      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.15s;
+      border: 1px solid transparent;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
-      white-space: nowrap;
+      font-size: 0.9rem;
+      transition: all 0.15s ease;
       text-decoration: none;
     }
 
     .btn-primary {
-      background: var(--primary);
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
       color: #fff;
-      border: 1px solid #3b82f6;
+      border-color: #3b82f6;
     }
 
     .btn-primary:hover {
-      background: var(--primary-hover);
+      background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
     }
 
     .btn-gold {
-      background: linear-gradient(135deg, #b88e3d 0%, #d4af61 100%);
+      background: linear-gradient(135deg, #a67c2e 0%, #c99c3a 50%, #dfb455 100%);
       color: #08101f;
+      border-color: #ebd08d;
+      font-weight: 800;
     }
 
     .btn-gold:hover {
       filter: brightness(1.08);
+      box-shadow: 0 4px 16px rgba(201, 156, 58, 0.45);
     }
 
     .btn-secondary {
-      background: var(--bg);
+      background: var(--surface);
       color: var(--text);
-      border: 1px solid var(--border);
+      border-color: var(--border);
     }
 
     .btn-secondary:hover {
       background: var(--surface-hover);
+      border-color: var(--border-light);
+    }
+
+    .btn-danger {
+      background: #7f1d1d;
+      color: #fecaca;
+      border-color: #991b1b;
+    }
+
+    .btn-danger:hover {
+      background: #991b1b;
     }
 
     .btn-sm {
       padding: 6px 12px;
-      font-size: 0.82rem;
-      border-radius: 7px;
-    }
-
-    .fields-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
-    }
-
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .field-group label {
-      font-size: 0.79rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .field-group input,
-    .field-group select,
-    .field-group textarea {
-      padding: 10px 12px;
-      font-size: 0.94rem;
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      outline: none;
-      transition: border-color 0.15s;
-      font-family: inherit;
-    }
-
-    .field-group input:focus,
-    .field-group select:focus,
-    .field-group textarea:focus {
-      border-color: var(--gold);
-    }
-
-    /* Results Toolbar */
-    .results-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .results-summary {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-    }
-
-    .results-summary strong {
-      color: var(--text);
-    }
-
-    /* Table & Person Thumbnails */
-    .table-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow-x: auto;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 0.91rem;
-    }
-
-    thead {
-      background: var(--surface-alt);
-      border-bottom: 2px solid var(--border);
-    }
-
-    th {
-      padding: 12px 13px;
-      font-weight: 700;
-      color: var(--gold-light);
-      white-space: nowrap;
       font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-    }
-
-    td {
-      padding: 10px 13px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    tbody tr {
-      transition: background 0.12s;
-      cursor: pointer;
-    }
-
-    tbody tr:hover {
-      background: var(--surface-hover);
-    }
-
-    tbody tr.selected-row {
-      background: rgba(37, 99, 235, 0.24);
-      outline: 1px solid var(--gold);
-    }
-
-    .person-identity-cell {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .person-thumb {
-      width: 48px;
-      height: 58px;
-      border-radius: 7px;
-      object-fit: contain;
-      border: 1.5px solid var(--gold);
-      background: #0b1528;
-      flex-shrink: 0;
-    }
-
-    .person-names {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .person-names .full-name {
-      font-weight: 800;
-      color: #ffffff;
-      font-size: 1rem;
-    }
-
-    .person-names .father-sub {
-      font-size: 0.81rem;
-      color: var(--text-muted);
-    }
-
-    .mono {
-      font-family: "Consolas", "Monaco", monospace;
-      font-size: 0.9rem;
-      color: #60a5fa;
-      font-weight: 700;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 9px;
       border-radius: 6px;
-      font-size: 0.77rem;
-      font-weight: 700;
-      white-space: nowrap;
     }
 
-    .badge-male {
-      background: rgba(29, 78, 216, 0.28);
-      color: #93c5fd;
-      border: 1px solid rgba(59, 130, 246, 0.45);
-    }
-
-    .badge-female {
-      background: rgba(190, 24, 93, 0.28);
-      color: #f9a8d4;
-      border: 1px solid rgba(236, 72, 153, 0.45);
-    }
-
-    .badge-phone {
-      background: rgba(16, 185, 129, 0.2);
-      color: #6ee7b7;
-      border: 1px solid rgba(16, 185, 129, 0.45);
-      font-family: monospace;
-      font-size: 0.85rem;
-    }
-
-    .clickable-filter {
-      color: #38bdf8;
-      text-decoration: underline;
-      text-decoration-style: dotted;
-      cursor: pointer;
-    }
-
-    .clickable-filter:hover {
-      color: #7dd3fc;
-    }
-
-    .date-sub {
-      display: block;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-family: monospace;
-    }
-
-    /* Action Prompt Row ("სრულად ნახვა") when clicking a person */
-    .expand-action-row td {
-      background: linear-gradient(90deg, #0d1b36 0%, #172e58 100%);
-      padding: 14px 20px;
-      border-bottom: 2px solid var(--gold);
-    }
-
-    .expand-action-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
-
-    /* Pagination */
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    /* Modals */
-    .modal-backdrop {
+    /* ============================================================ */
+    /* 1. AUTH GATEWAY (LOCK SCREEN / LOGIN GATEKEEPER)              */
+    /* ============================================================ */
+    #authGateway {
       position: fixed;
       inset: 0;
-      background: rgba(3, 8, 18, 0.82);
-      backdrop-filter: blur(4px);
-      display: none;
+      z-index: 99999;
+      background: radial-gradient(circle at center, #0f203d 0%, #070e1b 80%, #03070f 100%);
+      display: flex;
+      align-items: center;
       justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 18px;
+      padding: 20px;
     }
 
-    .modal-backdrop.open {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--surface);
-      border: 2px solid var(--gold);
-      border-radius: 14px;
-      max-width: 1040px;
+    .auth-box {
       width: 100%;
-      max-height: 92vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
-    }
-
-    /* Official MIA File / Dossier Inside Modal */
-    .mia-file-header {
-      background: linear-gradient(135deg, #091528 0%, #172f57 100%);
-      padding: 20px 26px;
-      border-bottom: 3px solid var(--gold);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .mia-file-brand {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .mia-file-brand img {
-      width: 64px;
-      height: 64px;
-      border-radius: 10px;
+      max-width: 460px;
+      background: rgba(14, 25, 45, 0.95);
       border: 2px solid var(--gold);
-      object-fit: contain;
-      background: #0a1931;
+      border-radius: 16px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(201, 156, 58, 0.18);
+      text-align: center;
+      backdrop-filter: blur(10px);
+      position: relative;
     }
 
-    .mia-file-brand h2 {
+    .auth-crest-wrap {
+      position: relative;
+      width: 105px;
+      height: 105px;
+      margin: 0 auto 18px;
+    }
+
+    .auth-crest-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 25px rgba(201, 156, 58, 0.5);
+    }
+
+    .auth-title {
       font-size: 1.35rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: #fff;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
     }
 
-    .mia-file-brand p {
-      font-size: 0.86rem;
+    .auth-subtitle {
+      font-size: 0.88rem;
       color: var(--gold-light);
+      margin-bottom: 20px;
     }
 
-    .mia-file-body {
-      padding: 24px 26px;
-    }
-
-    .dossier-grid {
-      display: grid;
-      grid-template-columns: 1fr 205px;
-      gap: 22px;
-      align-items: start;
+    .auth-notice-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(201, 156, 58, 0.15);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
       margin-bottom: 24px;
     }
 
-    @media (max-width: 820px) {
-      .dossier-grid {
-        grid-template-columns: 1fr;
-      }
+    .auth-form {
+      text-align: left;
     }
 
-    .dossier-photos-col {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+    .auth-form .field-group {
+      margin-bottom: 18px;
     }
 
-    .portrait-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-top: 3px solid var(--gold);
-      border-radius: 10px;
-      padding: 10px;
-      text-align: center;
-    }
-
-    .portrait-card .card-label {
-      font-size: 0.74rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--gold-light);
-      margin-bottom: 7px;
-      letter-spacing: 0.04em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-    }
-
-    .portrait-img {
-      width: 145px;
-      height: 170px;
-      margin: 0 auto;
+    .auth-form label {
       display: block;
-      object-fit: contain;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: #0d182c;
-    }
-
-    .father-portrait-img {
-      width: 145px;
-      height: 170px;
-      margin: 0 auto;
-      display: block;
-      object-fit: contain;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: #0d182c;
-    }
-
-    .portrait-name {
-      margin-top: 7px;
-      font-weight: 700;
       font-size: 0.85rem;
-      line-height: 1.35;
-      color: #fff;
-    }
-
-    .detail-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 12px;
-    }
-
-    .detail-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      padding: 11px 14px;
-      border-radius: 9px;
-    }
-
-    .detail-box .label {
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 3px;
-    }
-
-    .detail-box .val {
-      font-size: 0.98rem;
       font-weight: 700;
-      color: #fff;
-      word-break: break-word;
-    }
-
-    /* Secret Admin Login Modal */
-    .login-modal {
-      max-width: 430px;
-      padding: 28px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
     .input-with-icon {
@@ -688,8 +247,19 @@
 
     .input-with-icon input {
       width: 100%;
-      padding-left: 40px;
-      padding-right: 40px;
+      padding: 12px 42px 12px 40px;
+      background: #081223;
+      color: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-with-icon input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 156, 58, 0.35);
     }
 
     .input-with-icon .right-btn {
@@ -701,21 +271,532 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      padding: 4px;
+      padding: 6px;
     }
 
     .input-with-icon .right-btn:hover {
       color: #fff;
     }
 
-    /* Admin Panel Editor */
-    .admin-modal {
-      max-width: 980px;
+    .auth-error-box {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--danger);
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: none;
+      text-align: center;
+    }
+
+    .btn-auth-submit {
+      width: 100%;
+      padding: 13px;
+      font-size: 1rem;
+      border-radius: 10px;
+      justify-content: center;
+    }
+
+    /* ============================================================ */
+    /* 2. MAIN APPLICATION PORTAL                                    */
+    /* ============================================================ */
+    #mainApp {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .container {
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 16px 20px 40px;
+      width: 100%;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #091528 0%, #102140 100%);
+      border: 1.5px solid var(--gold);
+      border-radius: 14px;
+      padding: 16px 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mia-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      border: 2px solid var(--gold);
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(201, 156, 58, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .mia-logo:hover {
+      transform: scale(1.04);
+    }
+
+    .header-title h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .header-title p {
+      font-size: 0.85rem;
+      color: var(--gold-light);
+      margin-top: 3px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(14, 25, 45, 0.9);
+      border: 1px solid var(--border-light);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #fff;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .role-admin {
+      background: linear-gradient(135deg, #a67c2e 0%, #c99c3a 100%);
+      color: #08101f;
+      border: 1px solid #f2d187;
+    }
+
+    .role-premium {
+      background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%);
+      color: #fff;
+      border: 1px solid #c4b5fd;
+    }
+
+    .role-standard {
+      background: #1e3a8a;
+      color: #bfdbfe;
+      border: 1px solid #3b82f6;
+    }
+
+    .stats-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+
+    .stats-pill strong {
+      color: var(--gold-light);
+    }
+
+    /* Search Panel */
+    .search-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .quick-search-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .quick-input-wrap {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .quick-input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold-light);
+      pointer-events: none;
+    }
+
+    .quick-input {
+      width: 100%;
+      padding: 12px 16px 12px 46px;
+      background: #081223;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.98rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .quick-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 156, 58, 0.3);
+    }
+
+    .fields-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .field-group input,
+    .field-group select,
+    .field-group textarea {
+      width: 100%;
+      padding: 9px 12px;
+      background: #081223;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field-group input:focus,
+    .field-group select:focus,
+    .field-group textarea:focus {
+      border-color: var(--gold-light);
+    }
+
+    /* Results Bar */
+    .results-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .results-summary {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .results-summary strong {
+      color: var(--gold-light);
+    }
+
+    /* Results Table */
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-x: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+
+    thead th {
+      background: #091322;
+      color: var(--gold-light);
+      padding: 13px 14px;
+      font-weight: 800;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.4px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background-color 0.1s;
+    }
+
+    tbody tr:hover {
+      background-color: var(--surface-hover);
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      vertical-align: middle;
+    }
+
+    .person-identity-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .person-thumb {
+      width: 44px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--gold);
+      background: #081223;
+      flex-shrink: 0;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: 0.5px;
+    }
+
+    .clickable-filter {
+      cursor: pointer;
+      color: #93c5fd;
+      border-bottom: 1px dotted rgba(147, 197, 253, 0.4);
+    }
+
+    .clickable-filter:hover {
+      color: #bfdbfe;
+      border-bottom-style: solid;
+    }
+
+    /* Expand Action Bar */
+    .expand-action-row {
+      background: #0a162b !important;
+      border-top: 2px solid var(--gold) !important;
+      border-bottom: 2px solid var(--gold) !important;
+    }
+
+    .expand-action-bar {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding: 0 4px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* ============================================================ */
+    /* MODALS                                                       */
+    /* ============================================================ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      position: relative;
+    }
+
+    /* Full Dossier Modal */
+    .dossier-modal {
+      max-width: 1050px;
+    }
+
+    .mia-file-header {
+      background: linear-gradient(135deg, #091528 0%, #172f57 100%);
+      border-bottom: 2px solid var(--gold);
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .mia-file-body {
       padding: 24px;
     }
 
+    .photos-duo-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .photo-card {
+      background: var(--surface-card);
+      border: 1.5px solid var(--gold);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .photo-card-img {
+      width: 95px;
+      height: 115px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-light);
+      background: #081223;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .detail-box {
+      background: #0a1426;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    .detail-box .label {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .detail-box .val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    /* ============================================================ */
+    /* ADMIN PANEL MODAL                                            */
+    /* ============================================================ */
+    .admin-modal {
+      max-width: 1100px;
+      padding: 24px;
+    }
+
+    .admin-tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+      padding-bottom: 6px;
+    }
+
+    .admin-tab-btn {
+      padding: 10px 18px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .admin-tab-btn:hover {
+      color: #fff;
+    }
+
+    .admin-tab-btn.active {
+      color: var(--gold-light);
+      border-bottom-color: var(--gold);
+    }
+
+    .admin-tab-content {
+      display: none;
+    }
+
+    .admin-tab-content.active {
+      display: block;
+    }
+
+    .admin-user-card {
+      background: #091426;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
     .photo-upload-box {
-      background: var(--bg);
+      background: #081223;
       border: 1px dashed var(--gold);
       border-radius: 10px;
       padding: 14px;
@@ -727,270 +808,320 @@
     }
 
     .photo-upload-preview {
-      width: 140px;
-      height: 165px;
-      object-fit: contain;
+      width: 130px;
+      height: 155px;
+      object-fit: cover;
       border-radius: 8px;
       border: 1px solid var(--border);
-      background: #0d182c;
+      background: #081223;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--text-muted);
+    /* Small prompt modal */
+    .prompt-modal {
+      max-width: 420px;
+      padding: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Official Header with MIA Logo (3 fast clicks opens Admin Panel) -->
-    <header class="header">
-      <div class="header-brand">
-        <img
-          src="/logo.jpg"
-          alt="შინაგან საქმეთა სამინისტრო"
-          id="miaLogo"
-          class="mia-logo"
-          title="საქართველოს შინაგან საქმეთა სამინისტრო"
-        />
-        <div class="header-title">
-          <h1>შინაგან საქმეთა სამინისტრო</h1>
-          <p>ცენტრალური საინფორმაციო-ანალიტიკური მონაცემთა ბაზა (სრული ძებნა)</p>
-        </div>
+
+  <!-- ============================================================ -->
+  <!-- 1. AUTH GATEWAY (LOCK SCREEN / LOGIN GATEKEEPER)              -->
+  <!-- ============================================================ -->
+  <div id="authGateway">
+    <div class="auth-box">
+      <div class="auth-crest-wrap">
+        <img src="/logo.jpg" alt="შინაგან საქმეთა სამინისტრო" class="auth-crest-img" />
       </div>
 
-      <div class="header-right">
-        <div id="adminBadge" class="admin-status-badge" title="ადმინ პანელის გახსნა">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          ადმინ პანელი (მართვა)
-        </div>
-        <div class="stats-pill">
-          <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--gold-light);"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-          სულ ბაზაში: <strong id="totalRecordsCount">4,934,863</strong> ჩანაწერი
-        </div>
-      </div>
-    </header>
+      <h1 class="auth-title">შინაგან საქმეთა სამინისტრო</h1>
+      <p class="auth-subtitle">ცენტრალური საინფორმაციო-ანალიტიკური მონაცემთა ბაზა</p>
 
-    <!-- Search Panel -->
-    <section class="search-panel">
-      <form id="searchForm">
-        <div class="quick-search-row">
-          <div class="quick-input-wrap">
-            <svg class="svg-icon-lg quick-input-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <div class="auth-notice-pill">
+        <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="2"/></svg>
+        დაცული მონაცემთა ბაზა — ავტორიზაცია სავალდებულოა
+      </div>
+
+      <div id="gateErrorMsg" class="auth-error-box"></div>
+
+      <form id="gateLoginForm" class="auth-form" autocomplete="off">
+        <div class="field-group">
+          <label for="gateUserInp">მომხმარებლის სახელი (Username)</label>
+          <div class="input-with-icon">
+            <svg class="svg-icon left-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <input
               type="text"
-              id="qInput"
-              class="quick-input"
-              placeholder="ჩაწერეთ სახელი და გვარი ქართულად (მაგ: გიორგი ქავთარაძე) ან პირადი ნომერი..."
-              autocomplete="off"
+              id="gateUserInp"
+              placeholder="ჩაწერეთ მომხმარებელი..."
+              spellcheck="false"
+              required
               autofocus
             />
           </div>
-          <button type="submit" class="btn btn-primary">
-            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            ძებნა
-          </button>
-          <button type="button" id="clearBtn" class="btn btn-secondary">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-            გასუფთავება
-          </button>
         </div>
 
-        <div class="fields-grid">
-          <div class="field-group">
-            <label for="saxeliInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              სახელი
-            </label>
-            <input type="text" id="saxeliInput" placeholder="მაგ: გიორგი" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="gvariInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              გვარი
-            </label>
-            <input type="text" id="gvariInput" placeholder="მაგ: ქავთარაძე" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="mamisInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              მამის სახელი
-            </label>
-            <input type="text" id="mamisInput" placeholder="მაგ: დავითი" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="piradiInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="12" y2="16"/></svg>
-              პირადი ნომერი
-            </label>
-            <input type="text" id="piradiInput" placeholder="11-ნიშნა კოდი" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="qucaInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              მისამართი / ქუჩა
-            </label>
-            <input type="text" id="qucaInput" placeholder="მაგ: პეკინის გამზ" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="raioniInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-              რაიონი
-            </label>
-            <input type="text" id="raioniInput" placeholder="მაგ: საბურთალო" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="dabInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              დაბადების თარიღი
-            </label>
-            <input type="text" id="dabInput" placeholder="მაგ: 02/18/86" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="mocmobisInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              მოწმობის #
-            </label>
-            <input type="text" id="mocmobisInput" placeholder="მაგ: 1414770" autocomplete="off" />
-          </div>
-          <div class="field-group">
-            <label for="sqesiInput">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-              სქესი
-            </label>
-            <select id="sqesiInput">
-              <option value="">ყველა</option>
-              <option value="1">1 — მამრობითი</option>
-              <option value="2">2 — მდედრობითი</option>
-            </select>
+        <div class="field-group">
+          <label for="gatePassInp">პაროლი (Password)</label>
+          <div class="input-with-icon">
+            <svg class="svg-icon left-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input
+              type="password"
+              id="gatePassInp"
+              placeholder="ჩაწერეთ პაროლი..."
+              spellcheck="false"
+              required
+            />
+            <button type="button" class="right-btn" id="gateTogglePassBtn" title="პაროლის ჩვენება / დამალვა">
+              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
         </div>
-      </form>
-    </section>
 
-    <div class="results-toolbar">
-      <div class="results-summary" id="resultsSummary">
-        იტვირთება მონაცემები...
-      </div>
-      <div style="display: flex; gap: 10px;">
-        <button type="button" id="exportCsvBtn" class="btn btn-secondary btn-sm">
-          <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          CSV გადმოწერა
+        <button type="submit" id="gateSubmitBtn" class="btn btn-gold btn-auth-submit">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          სისტემაში შესვლა
         </button>
-      </div>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th># ID</th>
-            <th>ფოტო / სახელი და გვარი</th>
-            <th>პირადი #</th>
-            <th>დაბ. თარიღი</th>
-            <th>სქესი</th>
-            <th>მობილური</th>
-            <th>მისამართი / ქუჩა</th>
-            <th>რაიონი</th>
-            <th>მოწმობის #</th>
-            <th>მოქმედება</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody">
-          <tr>
-            <td colspan="10" class="empty-state">მიმდინარეობს ჩატვირთვა...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="pagination">
-      <button type="button" id="prevPageBtn" class="btn btn-secondary" disabled>
-        <svg class="svg-icon-sm" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-        წინა გვერდი
-      </button>
-      <span id="pageIndicator" style="color: var(--text-muted); font-size: 0.92rem;">გვერდი 1</span>
-      <button type="button" id="nextPageBtn" class="btn btn-secondary" disabled>
-        შემდეგი გვერდი
-        <svg class="svg-icon-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
+      </form>
     </div>
   </div>
 
-  <!-- 1. Official MIA Full File / Dossier Modal ("სრულად ნახვა") -->
-  <div class="modal-backdrop" id="personModal">
-    <div class="modal">
-      <div class="mia-file-header">
-        <div class="mia-file-brand">
-          <img src="/logo.jpg" alt="შსს ლოგო" />
-          <div>
-            <h2>საქართველოს შინაგან საქმეთა სამინისტრო</h2>
-            <p id="modalSubtitle">პიროვნების სააღრიცხვო ფაილი • სრული ინფორმაცია</p>
+  <!-- ============================================================ -->
+  <!-- 2. MAIN APPLICATION (SHOWN AFTER SUCCESSFUL LOGIN)           -->
+  <!-- ============================================================ -->
+  <div id="mainApp" style="display: none;">
+    <div class="container">
+
+      <!-- Header with MIA Branding -->
+      <header class="header">
+        <div class="header-brand">
+          <img
+            src="/logo.jpg"
+            alt="შინაგან საქმეთა სამინისტრო"
+            id="miaLogo"
+            class="mia-logo"
+            title="საქართველოს შინაგან საქმეთა სამინისტრო (3 სწრაფი კლიკი ხსნის მართვას)"
+          />
+          <div class="header-title">
+            <h1>შინაგან საქმეთა სამინისტრო</h1>
+            <p>ცენტრალური საინფორმაციო-ანალიტიკური მონაცემთა ბაზა (სრული ძებნა)</p>
           </div>
         </div>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button type="button" id="editInAdminFromModalBtn" class="btn btn-gold btn-sm" style="display: none;">
-            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            რედაქტირება (ადმინი)
+
+        <div class="header-right">
+          <!-- Active User Badge -->
+          <div class="user-pill" id="userPill">
+            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="userDisplayName">მომხმარებელი</span>
+            <span id="userRoleBadge" class="role-badge role-standard">სტანდარტული</span>
+          </div>
+
+          <!-- Admin Panel Button (Visible for Admins) -->
+          <button type="button" id="adminPanelOpenBtn" class="btn btn-gold btn-sm" style="display: none;">
+            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            ადმინ პანელი
           </button>
-          <a id="openStandaloneFileBtn" href="#" target="_blank" class="btn btn-primary btn-sm">
+
+          <!-- Records Stats -->
+          <div class="stats-pill">
+            <svg class="svg-icon-sm" viewBox="0 0 24 24" style="color: var(--gold-light);"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            სულ: <strong id="totalRecordsCount">4,934,864</strong> ჩანაწერი
+          </div>
+
+          <!-- Logout Button -->
+          <button type="button" id="logoutBtn" class="btn btn-secondary btn-sm" title="სისტემიდან გამოსვლა">
+            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            გამოსვლა
+          </button>
+        </div>
+      </header>
+
+      <!-- Search Section -->
+      <section class="search-panel">
+        <form id="searchForm">
+          <div class="quick-search-row">
+            <div class="quick-input-wrap">
+              <svg class="svg-icon-lg quick-input-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                type="text"
+                id="qInput"
+                class="quick-input"
+                placeholder="ჩაწერეთ სახელი და გვარი ქართულად (მაგ: გიორგი ქავთარაძე) ან პირადი ნომერი..."
+                autocomplete="off"
+              />
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              ძებნა
+            </button>
+            <button type="button" id="clearBtn" class="btn btn-secondary">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+              გასუფთავება
+            </button>
+          </div>
+
+          <!-- Advanced Filters -->
+          <div class="fields-grid">
+            <div class="field-group">
+              <label>სახელი (saxeli)</label>
+              <input type="text" id="saxeliInput" placeholder="მაგ: გიორგი" />
+            </div>
+            <div class="field-group">
+              <label>გვარი (gvari)</label>
+              <input type="text" id="gvariInput" placeholder="მაგ: ქავთარაძე" />
+            </div>
+            <div class="field-group">
+              <label>მამის სახელი (mamis saxeli)</label>
+              <input type="text" id="mamisInput" placeholder="მაგ: დავით" />
+            </div>
+            <div class="field-group">
+              <label>პირადი ნომერი (11 ნიშნა)</label>
+              <input type="text" id="piradiInput" placeholder="მაგ: 01024038327" maxlength="11" />
+            </div>
+            <div class="field-group">
+              <label>ქუჩა / მისამართი</label>
+              <input type="text" id="qucaInput" placeholder="მაგ: ვაჟა-ფშაველა" />
+            </div>
+            <div class="field-group">
+              <label>რაიონი / ქალაქი</label>
+              <input type="text" id="raioniInput" placeholder="მაგ: საბურთალო" />
+            </div>
+            <div class="field-group">
+              <label>დაბადების წელი</label>
+              <input type="text" id="dabInput" placeholder="მაგ: 1986 ან 86" />
+            </div>
+            <div class="field-group">
+              <label>მოწმობის #</label>
+              <input type="text" id="mocmobisInput" placeholder="მაგ: 0626343" />
+            </div>
+            <div class="field-group">
+              <label>სქესი</label>
+              <select id="sqesiInput">
+                <option value="">ყველა სქესი</option>
+                <option value="1">1 — მამრობითი</option>
+                <option value="2">2 — მდედრობითი</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Results Stats & Action Bar -->
+      <div class="results-bar">
+        <div class="results-summary" id="resultsSummary">
+          მოიძებნა: <strong>0</strong> ჩანაწერი
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="exportCsvBtn" class="btn btn-secondary btn-sm">
+            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            CSV ექსპორტი
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Results Table -->
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 55px;">#ID</th>
+              <th>პიროვნება / ფოტო</th>
+              <th>პირადი #</th>
+              <th>მამის სახელი და გვარი</th>
+              <th>დაბ. თარიღი</th>
+              <th>სქესი</th>
+              <th>მისამართი (იურიდიული / ფაქტ.)</th>
+              <th>რაიონი</th>
+              <th>მოწმობა</th>
+              <th style="text-align: right; width: 140px;">მოქმედება</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            <tr>
+              <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                ჩაწერეთ სახელი, გვარი ან პირადი ნომერი ზემოთ და დააჭირეთ „ძებნა“-ს
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-bar">
+        <button type="button" id="prevPageBtn" class="btn btn-secondary btn-sm" disabled>
+          ← წინა გვერდი
+        </button>
+        <span id="pageIndicator" style="font-size: 0.88rem; color: var(--text-muted); font-weight: 700;">გვერდი 1</span>
+        <button type="button" id="nextPageBtn" class="btn btn-secondary btn-sm" disabled>
+          შემდეგი გვერდი →
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 3. OFFICIAL DOSSIER MODAL (FULL VIEW)                         -->
+  <!-- ============================================================ -->
+  <div class="modal-backdrop" id="personModal">
+    <div class="modal dossier-modal">
+      <div class="mia-file-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <img src="/logo.jpg" alt="შსს" style="width: 48px; height: 48px; border-radius: 8px; border: 1.5px solid var(--gold);" />
+          <div>
+            <h2 style="font-size: 1.2rem; color: #fff; font-weight: 800;">შინაგან საქმეთა სამინისტრო — პირადი საქმე</h2>
+            <p id="modalSubtitle" style="font-size: 0.82rem; color: var(--gold-light);">ელექტრონული საინფორმაციო ბარათი</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a id="openStandaloneFileBtn" href="#" target="_blank" class="btn btn-gold btn-sm">
             <svg class="svg-icon-sm" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-            ცალკე ფაილად გახსნა / ბეჭდვა
+            PDF / ბეჭდვა
           </a>
-          <button type="button" id="closeModalBtn" class="btn btn-secondary btn-sm">
-            <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            დახურვა
-          </button>
+          <button type="button" id="closeModalBtn" class="btn btn-secondary btn-sm">დახურვა</button>
         </div>
       </div>
 
       <div class="mia-file-body">
-        <div class="dossier-grid">
-          <div>
-            <h3 style="font-size: 1rem; color: var(--gold-light); text-transform: uppercase; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; display: flex; align-items: center; gap: 8px;">
-              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              პიროვნების სრული მონაცემები ბაზიდან
-            </h3>
-            <div class="detail-grid" id="modalDetailsGrid"></div>
+        <!-- Duo Photos (Person + Father) -->
+        <div class="photos-duo-container">
+          <div class="photo-card">
+            <img id="modalPersonPhoto" src="" alt="პიროვნება" class="photo-card-img" />
+            <div>
+              <div style="font-size: 0.76rem; color: var(--gold-light); text-transform: uppercase; font-weight: 800;">პიროვნების ფოტოსურათი</div>
+              <div id="modalPersonName" style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 4px;">—</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">საიდენტიფიკაციო ბარათი</div>
+            </div>
           </div>
 
-          <div class="dossier-photos-col">
-            <div class="portrait-card">
-              <div class="card-label">
-                <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                პიროვნების ფოტო
-              </div>
-              <img id="modalPersonPhoto" src="" alt="პიროვნების ფოტო" class="portrait-img" />
-              <div class="portrait-name" id="modalPersonName">—</div>
-            </div>
-
-            <div class="portrait-card">
-              <div class="card-label">
-                <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                მამის ფოტო
-              </div>
-              <img id="modalFatherPhoto" src="" alt="მამის ფოტო" class="father-portrait-img" />
-              <div class="portrait-name" id="modalFatherName">—</div>
+          <div class="photo-card">
+            <img id="modalFatherPhoto" src="" alt="მამა" class="photo-card-img" />
+            <div>
+              <div style="font-size: 0.76rem; color: var(--gold-light); text-transform: uppercase; font-weight: 800;">მამის ფოტოსურათი</div>
+              <div id="modalFatherName" style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 4px;">—</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">გენეალოგიური ჩანაწერი</div>
             </div>
           </div>
         </div>
 
-        <div id="coResidentsSection" style="display: none; margin-top: 18px;">
-          <h3 style="font-size: 1rem; margin-bottom: 10px; color: var(--gold-light); display: flex; align-items: center; gap: 8px;">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            ამავე მისამართზე და გვარზე რეგისტრირებული სხვა პირები (ოჯახის წევრები):
+        <!-- Full Detailed Fields -->
+        <div class="details-grid" id="modalDetailsGrid"></div>
+
+        <!-- Family / Co-Residents -->
+        <div id="coResidentsSection" style="margin-top: 18px; display: none;">
+          <h3 style="font-size: 0.95rem; color: var(--gold-light); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            ამავე მისამართზე და გვარზე რეგისტრირებული ოჯახის წევრები
           </h3>
-          <div class="table-wrap" style="max-height: 250px; overflow-y: auto;">
+          <div class="table-container" style="max-height: 220px;">
             <table>
               <thead>
                 <tr>
-                  <th>ფოტო / სახელი და გვარი</th>
+                  <th>პიროვნება</th>
                   <th>პირადი #</th>
                   <th>მამის სახელი და გვარი</th>
                   <th>დაბ. თარიღი</th>
-                  <th>მოწმობის #</th>
-                  <th>ფაილი</th>
+                  <th>მოწმობა</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="coResidentsBody"></tbody>
@@ -1001,265 +1132,284 @@
     </div>
   </div>
 
-  <!-- 2. Secret Admin Login Modal (Opened by 3 rapid clicks on MIA Logo) -->
-  <div class="modal-backdrop" id="adminLoginModal">
-    <div class="modal login-modal">
-      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
-        <img src="/logo.jpg" alt="შსს" style="width: 50px; height: 50px; border-radius: 9px; border: 1.5px solid var(--gold);" />
-        <div>
-          <h3 style="font-size: 1.15rem; color: #fff; display: flex; align-items: center; gap: 6px;">
-            <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--gold-light);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            სისტემური ავტორიზაცია
-          </h3>
-          <p style="font-size: 0.82rem; color: var(--text-muted);">შინაგან საქმეთა სამინისტრო — ადმინ პანელი</p>
-        </div>
-      </div>
-
-      <form id="adminLoginForm" autocomplete="off">
-        <div class="field-group" style="margin-bottom: 14px;">
-          <label for="adminUserInp">სახელი (Login)</label>
-          <div class="input-with-icon">
-            <svg class="svg-icon left-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input
-              type="password"
-              id="adminUserInp"
-              autocomplete="off"
-              spellcheck="false"
-              required
-            />
-            <button type="button" class="right-btn" id="toggleUserVisBtn" title="ჩვენება / დამალვა">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="field-group" style="margin-bottom: 18px;">
-          <label for="adminPassInp">პაროლი (Password)</label>
-          <div class="input-with-icon">
-            <svg class="svg-icon left-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input
-              type="password"
-              id="adminPassInp"
-              autocomplete="new-password"
-              spellcheck="false"
-              required
-            />
-            <button type="button" class="right-btn" id="togglePassVisBtn" title="ჩვენება / დამალვა">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </button>
-          </div>
-        </div>
-        <div id="adminLoginError" style="color: var(--danger); font-size: 0.86rem; margin-bottom: 12px; display: none;"></div>
-        <div style="display: flex; justify-content: flex-end; gap: 10px;">
-          <button type="button" id="closeLoginModalBtn" class="btn btn-secondary btn-sm">გაუქმება</button>
-          <button type="submit" class="btn btn-gold btn-sm">
-            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            შესვლა
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 3. Admin Panel Modal (Manage Photos, Father's Photo, Phone, Addresses, Full Data) -->
+  <!-- ============================================================ -->
+  <!-- 4. ADMIN PANEL MODAL (USER MANAGEMENT & DATA ENRICHMENT)    -->
+  <!-- ============================================================ -->
   <div class="modal-backdrop" id="adminPanelModal">
     <div class="modal admin-modal">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 14px; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="/logo.jpg" alt="შსს" style="width: 46px; height: 46px; border-radius: 8px; border: 1px solid var(--gold);" />
+          <img src="/logo.jpg" alt="შსს" style="width: 44px; height: 44px; border-radius: 8px; border: 1.5px solid var(--gold);" />
           <div>
-            <h2 style="font-size: 1.25rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+            <h2 style="font-size: 1.25rem; color: #fff; font-weight: 800; display: flex; align-items: center; gap: 8px;">
               <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--gold-light);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              შსს ადმინისტრატორის პანელი
+              შსს ცენტრალური ადმინისტრირების პანელი
             </h2>
-            <p style="font-size: 0.83rem; color: var(--gold-light);">პიროვნების ფოტოს, მამის ფოტოს, მობილურის, მისამართების და მონაცემების მართვა</p>
+            <p style="font-size: 0.83rem; color: var(--gold-light);">მომხმარებელთა მართვა (პრემიუმ/სტანდარტული), ფოტოები და მონაცემების გამდიდრება</p>
           </div>
         </div>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" id="newPersonAdminBtn" class="btn btn-primary btn-sm">
+        <button type="button" id="closeAdminPanelBtn" class="btn btn-secondary btn-sm">დახურვა</button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="admin-tabs-nav">
+        <button type="button" class="admin-tab-btn active" data-tab="usersTab">
+          <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          👥 მომხმარებელთა მართვა (ექაუნთები)
+        </button>
+        <button type="button" class="admin-tab-btn" data-tab="recordsTab">
+          <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          📝 ბაზის ჩანაწერების რედაქტირება და ფოტოები
+        </button>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- TAB 1: USER ACCOUNTS MANAGEMENT                -->
+      <!-- ============================================== -->
+      <div class="admin-tab-content active" id="usersTab">
+
+        <!-- Create User Card -->
+        <div class="admin-user-card">
+          <h3 style="font-size: 1rem; color: var(--gold-light); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
             <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            ახალი პიროვნების დამატება
-          </button>
-          <button type="button" id="logoutAdminBtn" class="btn btn-secondary btn-sm">
-            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            გამოსვლა
-          </button>
-          <button type="button" id="closeAdminPanelBtn" class="btn btn-secondary btn-sm">
-            <svg class="svg-icon-sm" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            დახურვა
-          </button>
+            ახალი მომხმარებლის (ექაუნთის) შექმნა
+          </h3>
+
+          <form id="createUserForm">
+            <div class="fields-grid" style="margin-bottom: 14px;">
+              <div class="field-group">
+                <label>მომხმარებლის სახელი (Username)*</label>
+                <input type="text" id="newUsername" placeholder="მაგ: daviti_vip" required />
+              </div>
+
+              <div class="field-group">
+                <label>პაროლი (Password)*</label>
+                <input type="password" id="newUserPass" placeholder="მინიმუმ 4 სიმბოლო" required />
+              </div>
+
+              <div class="field-group">
+                <label>ექაუნთის ტიპი (დონე)*</label>
+                <select id="newUserRole">
+                  <option value="premium">⭐ პრემიუმი (სრული წვდომა, დოსიეები, ფოტოები)</option>
+                  <option value="standard">👤 ჩვეულებრივი (სტანდარტული ძებნა)</option>
+                  <option value="admin">👑 ადმინისტრატორი (სრული მართვა)</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label>მფლობელის სახელი (Display Name)</label>
+                <input type="text" id="newUserDisplayName" placeholder="მაგ: დავით ბერიძე" />
+              </div>
+
+              <div class="field-group">
+                <label>შენიშვნა / ლიცენზია</label>
+                <input type="text" id="newUserNotes" placeholder="მაგ: 3 თვიანი წვდომა" />
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div id="createUserFeedback" style="font-size: 0.88rem; font-weight: 700;"></div>
+              <button type="submit" class="btn btn-gold btn-sm">
+                <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                მომხმარებლის შექმნა
+              </button>
+            </div>
+          </form>
         </div>
+
+        <!-- Users List Table -->
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-size: 1rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              სისტემაში რეგისტრირებული მომხმარებლები
+            </h3>
+            <button type="button" id="refreshUsersBtn" class="btn btn-secondary btn-sm">
+              <svg class="svg-icon-sm" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              განახლება
+            </button>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 45px;">ID</th>
+                  <th>მომხმარებელი (Username)</th>
+                  <th>სრული სახელი</th>
+                  <th>ტიპი (დონე)</th>
+                  <th>სტატუსი</th>
+                  <th>შექმნის თარიღი</th>
+                  <th>შენიშვნა</th>
+                  <th style="text-align: right;">მოქმედება</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 20px;">იტვირთება...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Quick Lookup Inside Admin Panel -->
-      <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 18px;">
-        <div style="font-size: 0.84rem; font-weight: 700; color: var(--gold-light); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-          <svg class="svg-icon-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          მოძებნეთ პიროვნება ბაზაში სარედაქტირებლად (სახელი და გვარი, პირადი # ან #ID):
+      <!-- ============================================== -->
+      <!-- TAB 2: PERSON DATA ENRICHMENT & PHOTOS          -->
+      <!-- ============================================== -->
+      <div class="admin-tab-content" id="recordsTab">
+
+        <!-- Quick Lookup Inside Admin -->
+        <div style="background: #081223; border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 18px;">
+          <div style="font-size: 0.84rem; font-weight: 700; color: var(--gold-light); margin-bottom: 8px;">
+            მოძებნეთ პიროვნება ბაზაში სარედაქტირებლად (სახელი და გვარი, პირადი # ან #ID):
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <input
+              type="text"
+              id="adminSearchInput"
+              placeholder="მაგ: გიორგი ქავთარაძე ან 01024038327"
+              style="flex: 1; padding: 9px 12px; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 8px;"
+            />
+            <button type="button" id="adminSearchBtn" class="btn btn-primary btn-sm">ძებნა</button>
+          </div>
+          <div id="adminSearchResults" style="margin-top: 10px; max-height: 160px; overflow-y: auto; display: none;"></div>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <input
-            type="text"
-            id="adminSearchInput"
-            placeholder="მაგ: გიორგი ქავთარაძე ან 01024038327"
-            style="flex: 1; padding: 9px 12px; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 8px;"
-          />
-          <button type="button" id="adminSearchBtn" class="btn btn-primary btn-sm">
-            <svg class="svg-icon-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            ძებნა
-          </button>
-        </div>
-        <div id="adminSearchResults" style="margin-top: 10px; max-height: 160px; overflow-y: auto; display: none;"></div>
+
+        <form id="adminPersonForm">
+          <input type="hidden" id="admId" value="0" />
+
+          <div style="margin-bottom: 14px; font-size: 0.92rem; color: #6ee7b7; font-weight: 700;" id="admEditingStatus">
+            არჩეული ჩანაწერი: ახალი ჩანაწერის შექმნა (ან მოძებნეთ პიროვნება ზემოთ)
+          </div>
+
+          <!-- Photo & Father Photo Upload Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+            <div class="photo-upload-box">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
+                <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                პიროვნების ფოტოსურათი
+              </div>
+              <img id="admPhotoPreview" src="" alt="პიროვნების ფოტო" class="photo-upload-preview" />
+              <input type="file" id="admPhotoFile" accept="image/*" style="font-size: 0.82rem; max-width: 240px;" />
+              <input type="text" id="admPhotoUrl" placeholder="ან ჩასვით ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.83rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
+            </div>
+
+            <div class="photo-upload-box">
+              <div style="font-weight: 700; font-size: 0.85rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
+                <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                მამის ფოტოსურათი
+              </div>
+              <img id="admFatherPhotoPreview" src="" alt="მამის ფოტო" class="photo-upload-preview" />
+              <input type="file" id="admFatherPhotoFile" accept="image/*" style="font-size: 0.82rem; max-width: 240px;" />
+              <input type="text" id="admFatherPhotoUrl" placeholder="ან ჩასვით მამის ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.83rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
+            </div>
+          </div>
+
+          <div class="fields-grid" style="margin-bottom: 18px;">
+            <div class="field-group">
+              <label>სახელი*</label>
+              <input type="text" id="admSaxeli" required />
+            </div>
+            <div class="field-group">
+              <label>გვარი*</label>
+              <input type="text" id="admGvari" required />
+            </div>
+            <div class="field-group">
+              <label>მამის სახელი</label>
+              <input type="text" id="admMamis" />
+            </div>
+            <div class="field-group">
+              <label>პირადი ნომერი</label>
+              <input type="text" id="admPiradi" />
+            </div>
+            <div class="field-group">
+              <label style="color: #6ee7b7;">მობილურის ნომერი</label>
+              <input type="text" id="admPhone" placeholder="მაგ: 599 12 34 56" />
+            </div>
+            <div class="field-group">
+              <label>დაბადების თარიღი</label>
+              <input type="text" id="admDab" placeholder="მაგ: 02/18/86 00:00:00" />
+            </div>
+            <div class="field-group">
+              <label>იურიდიული მისამართი (ქუჩა)</label>
+              <input type="text" id="admQuca" />
+            </div>
+            <div class="field-group">
+              <label style="color: #6ee7b7;">ფაქტობრივი მისამართი</label>
+              <input type="text" id="admActualAddress" placeholder="ფაქტობრივი საცხოვრებელი..." />
+            </div>
+            <div class="field-group">
+              <label>რაიონი / ქალაქი</label>
+              <input type="text" id="admRaioni" />
+            </div>
+            <div class="field-group">
+              <label>სქესი</label>
+              <select id="admSqesi">
+                <option value="1">1 — მამრობითი</option>
+                <option value="2">2 — მდედრობითი</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label>მოწმობის ნომერი</label>
+              <input type="text" id="admMocmobis" />
+            </div>
+            <div class="field-group">
+              <label>რეგისტრაციის თარიღი</label>
+              <input type="text" id="admReg" />
+            </div>
+            <div class="field-group">
+              <label>DMONAC კოდი</label>
+              <input type="text" id="admDmonac" />
+            </div>
+            <div class="field-group">
+              <label style="color: #6ee7b7;">სამუშაო ადგილი</label>
+              <input type="text" id="admWorkplace" />
+            </div>
+            <div class="field-group">
+              <label style="color: #6ee7b7;">ავტომობილი</label>
+              <input type="text" id="admVehicle" placeholder="მაგ: AA-123-AA" />
+            </div>
+            <div class="field-group">
+              <label style="color: #6ee7b7;">სტატუსი</label>
+              <input type="text" id="admStatusNote" placeholder="მაგ: აქტიური" />
+            </div>
+          </div>
+
+          <div class="field-group" style="margin-bottom: 18px;">
+            <label style="color: #6ee7b7;">დამატებითი შენიშვნები / დოსიეს ჩანაწერი</label>
+            <textarea id="admNotes" rows="2" placeholder="შეიყვანეთ დამატებითი ინფორმაცია..."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+            <div id="admSaveFeedback" style="font-weight: 700; font-size: 0.92rem;"></div>
+            <button type="submit" class="btn btn-gold">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              ბაზაში შენახვა
+            </button>
+          </div>
+        </form>
       </div>
 
-      <!-- Admin Person Edit Form -->
-      <form id="adminPersonForm">
-        <input type="hidden" id="admId" value="0" />
-
-        <div style="margin-bottom: 14px; font-size: 0.92rem; color: var(--accent); font-weight: 700;" id="admEditingStatus">
-          არჩეული ჩანაწერი: ახალი ჩანაწერის შექმნა (ან მოძებნეთ პიროვნება ზემოთ)
-        </div>
-
-        <!-- Photo & Father Photo Upload Row -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
-          <div class="photo-upload-box">
-            <div style="font-weight: 700; font-size: 0.85rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              პიროვნების ფოტოსურათი
-            </div>
-            <img id="admPhotoPreview" src="" alt="პიროვნების ფოტო" class="photo-upload-preview" />
-            <input type="file" id="admPhotoFile" accept="image/*" style="font-size: 0.82rem; max-width: 240px;" />
-            <input type="text" id="admPhotoUrl" placeholder="ან ჩასვით ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.83rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
-          </div>
-
-          <div class="photo-upload-box">
-            <div style="font-weight: 700; font-size: 0.85rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              მამის ფოტოსურათი
-            </div>
-            <img id="admFatherPhotoPreview" src="" alt="მამის ფოტო" class="photo-upload-preview" />
-            <input type="file" id="admFatherPhotoFile" accept="image/*" style="font-size: 0.82rem; max-width: 240px;" />
-            <input type="text" id="admFatherPhotoUrl" placeholder="ან ჩასვით მამის ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.83rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
-          </div>
-        </div>
-
-        <div class="fields-grid" style="margin-bottom: 18px;">
-          <div class="field-group">
-            <label>სახელი</label>
-            <input type="text" id="admSaxeli" required />
-          </div>
-          <div class="field-group">
-            <label>გვარი</label>
-            <input type="text" id="admGvari" required />
-          </div>
-          <div class="field-group">
-            <label>მამის სახელი</label>
-            <input type="text" id="admMamis" />
-          </div>
-          <div class="field-group">
-            <label>პირადი ნომერი</label>
-            <input type="text" id="admPiradi" />
-          </div>
-          <div class="field-group">
-            <label style="color: #6ee7b7;">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-              მობილურის ნომერი
-            </label>
-            <input type="text" id="admPhone" placeholder="მაგ: 599 12 34 56" />
-          </div>
-          <div class="field-group">
-            <label>დაბადების თარიღი</label>
-            <input type="text" id="admDab" placeholder="მაგ: 02/18/86 00:00:00" />
-          </div>
-          <div class="field-group">
-            <label>იურიდიული მისამართი (ქუჩა)</label>
-            <input type="text" id="admQuca" />
-          </div>
-          <div class="field-group">
-            <label style="color: #6ee7b7;">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-              ფაქტობრივი / დამ. მისამართი
-            </label>
-            <input type="text" id="admActualAddress" placeholder="ფაქტობრივი საცხოვრებელი..." />
-          </div>
-          <div class="field-group">
-            <label>რაიონი / ქალაქი</label>
-            <input type="text" id="admRaioni" />
-          </div>
-          <div class="field-group">
-            <label>სქესი</label>
-            <select id="admSqesi">
-              <option value="1">1 — მამრობითი</option>
-              <option value="2">2 — მდედრობითი</option>
-            </select>
-          </div>
-          <div class="field-group">
-            <label>მოწმობის ნომერი</label>
-            <input type="text" id="admMocmobis" />
-          </div>
-          <div class="field-group">
-            <label>რეგისტრაციის თარიღი</label>
-            <input type="text" id="admReg" />
-          </div>
-          <div class="field-group">
-            <label>DMONAC კოდი</label>
-            <input type="text" id="admDmonac" />
-          </div>
-          <div class="field-group">
-            <label style="color: #6ee7b7;">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              სამუშაო ადგილი / პოზიცია
-            </label>
-            <input type="text" id="admWorkplace" />
-          </div>
-          <div class="field-group">
-            <label style="color: #6ee7b7;">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
-              ავტომობილი / სახ. ნომერი
-            </label>
-            <input type="text" id="admVehicle" placeholder="მაგ: AA-123-AA" />
-          </div>
-          <div class="field-group">
-            <label style="color: #6ee7b7;">
-              <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              სტატუსი
-            </label>
-            <input type="text" id="admStatusNote" placeholder="მაგ: აქტიური / შემოწმებული" />
-          </div>
-        </div>
-
-        <div class="field-group" style="margin-bottom: 18px;">
-          <label style="color: #6ee7b7;">
-            <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            დამატებითი შენიშვნები / დოსიეს ჩანაწერი
-          </label>
-          <textarea id="admNotes" rows="2" placeholder="შეიყვანეთ დამატებითი ოპერატიული ან სააღრიცხვო ინფორმაცია..."></textarea>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
-          <div id="admSaveFeedback" style="font-weight: 700; font-size: 0.92rem;"></div>
-          <button type="submit" class="btn btn-gold">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            ბაზაში შენახვა
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 
+  <!-- Javascript -->
   <script>
     const PAGE_SIZE = 100;
     let currentOffset = 0;
     let lastRows = [];
     let selectedRowId = null;
     let currentModalPerson = null;
-    let adminToken = sessionStorage.getItem('mia_admin_token') || '';
 
-    // SVG Icons for dynamic table rendering
-    const ICON_FILE = `<svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`;
-    const ICON_EDIT = `<svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
-    const ICON_PRINT = `<svg class="svg-icon-sm" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
-    const ICON_PHONE = `<svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
-    const ICON_HOME = `<svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`;
+    let authToken = localStorage.getItem('mia_auth_token') || '';
+    let currentUser = null;
+    try {
+      currentUser = JSON.parse(localStorage.getItem('mia_auth_user') || 'null');
+    } catch (e) {
+      currentUser = null;
+    }
 
     const DEFAULT_AVATAR_MALE = "data:image/svg+xml;utf8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
@@ -1272,13 +1422,353 @@
 
     const DEFAULT_AVATAR_FEMALE = "data:image/svg+xml;utf8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
-        <rect width="200" height="240" fill="#101e36"/>
-        <circle cx="100" cy="82" r="42" fill="#4c3d6e"/>
-        <path d="M35 225 C35 162 165 162 165 225 Z" fill="#4c3d6e"/>
+        <rect width="200" height="240" fill="#4c3d6e"/>
+        <circle cx="100" cy="82" r="42" fill="#6d549c"/>
+        <path d="M35 225 C35 162 165 162 165 225 Z" fill="#6d549c"/>
         <text x="100" y="233" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="11">შსს ფოტო</text>
       </svg>
     `);
 
+    // ==========================================
+    // AUTHENTICATION LOGIC (GATEKEEPER)
+    // ==========================================
+    const authGateway = document.getElementById('authGateway');
+    const mainApp = document.getElementById('mainApp');
+    const gateLoginForm = document.getElementById('gateLoginForm');
+    const gateUserInp = document.getElementById('gateUserInp');
+    const gatePassInp = document.getElementById('gatePassInp');
+    const gateErrorMsg = document.getElementById('gateErrorMsg');
+    const gateTogglePassBtn = document.getElementById('gateTogglePassBtn');
+    const userDisplayName = document.getElementById('userDisplayName');
+    const userRoleBadge = document.getElementById('userRoleBadge');
+    const adminPanelOpenBtn = document.getElementById('adminPanelOpenBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    gateTogglePassBtn.addEventListener('click', () => {
+      gatePassInp.type = gatePassInp.type === 'password' ? 'text' : 'password';
+    });
+
+    function setAuthState(token, user) {
+      authToken = token;
+      currentUser = user;
+      if (token && user) {
+        localStorage.setItem('mia_auth_token', token);
+        localStorage.setItem('mia_auth_user', JSON.stringify(user));
+        authGateway.style.display = 'none';
+        mainApp.style.display = 'flex';
+
+        userDisplayName.textContent = user.displayName || user.username;
+        userRoleBadge.className = 'role-badge';
+        if (user.role === 'admin') {
+          userRoleBadge.classList.add('role-admin');
+          userRoleBadge.textContent = '👑 ადმინისტრატორი';
+          adminPanelOpenBtn.style.display = 'inline-flex';
+        } else if (user.role === 'premium') {
+          userRoleBadge.classList.add('role-premium');
+          userRoleBadge.textContent = '⭐ პრემიუმი';
+          adminPanelOpenBtn.style.display = 'none';
+        } else {
+          userRoleBadge.classList.add('role-standard');
+          userRoleBadge.textContent = '👤 სტანდარტული';
+          adminPanelOpenBtn.style.display = 'none';
+        }
+
+        performSearch(0);
+      } else {
+        localStorage.removeItem('mia_auth_token');
+        localStorage.removeItem('mia_auth_user');
+        authGateway.style.display = 'flex';
+        mainApp.style.display = 'none';
+        gatePassInp.value = '';
+        gateUserInp.focus();
+      }
+    }
+
+    gateLoginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      gateErrorMsg.style.display = 'none';
+      const username = gateUserInp.value.trim();
+      const password = gatePassInp.value.trim();
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.ok && data.token && data.user) {
+          setAuthState(data.token, data.user);
+        } else {
+          gateErrorMsg.textContent = data.error || 'არასწორი მომხმარებელი ან პაროლი!';
+          gateErrorMsg.style.display = 'block';
+        }
+      } catch (err) {
+        gateErrorMsg.textContent = 'სერვერთან კავშირის შეცდომა!';
+        gateErrorMsg.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'x-auth-token': authToken }
+        });
+      } catch (e) {}
+      setAuthState('', null);
+    });
+
+    // Check existing session
+    async function verifyExistingAuth() {
+      if (!authToken) {
+        setAuthState('', null);
+        return;
+      }
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'x-auth-token': authToken }
+        });
+        const data = await res.json();
+        if (data.ok && data.user) {
+          setAuthState(authToken, data.user);
+        } else {
+          setAuthState('', null);
+        }
+      } catch (err) {
+        // If network error, still try to use saved state
+        if (currentUser) {
+          setAuthState(authToken, currentUser);
+        } else {
+          setAuthState('', null);
+        }
+      }
+    }
+    verifyExistingAuth();
+
+    // MIA Logo fast triple-click shortcut
+    let logoClicks = [];
+    document.getElementById('miaLogo').addEventListener('click', () => {
+      const now = Date.now();
+      logoClicks.push(now);
+      logoClicks = logoClicks.filter(t => now - t < 1000);
+      if (logoClicks.length >= 3) {
+        logoClicks = [];
+        if (currentUser && currentUser.role === 'admin') {
+          openAdminPanel();
+        } else {
+          alert('ადმინ პანელზე წვდომისთვის საჭიროა ადმინისტრატორის ანგარიშით ავტორიზაცია!');
+        }
+      }
+    });
+
+    adminPanelOpenBtn.addEventListener('click', () => {
+      openAdminPanel();
+    });
+
+    // ==========================================
+    // ADMIN PANEL TABS & USER MANAGEMENT
+    // ==========================================
+    const adminPanelModal = document.getElementById('adminPanelModal');
+    const closeAdminPanelBtn = document.getElementById('closeAdminPanelBtn');
+    const tabButtons = document.querySelectorAll('.admin-tab-btn');
+    const tabContents = document.querySelectorAll('.admin-tab-content');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const targetId = btn.dataset.tab;
+        document.getElementById(targetId).classList.add('active');
+        if (targetId === 'usersTab') {
+          loadSystemUsers();
+        }
+      });
+    });
+
+    function openAdminPanel() {
+      adminPanelModal.classList.add('open');
+      loadSystemUsers();
+    }
+
+    closeAdminPanelBtn.addEventListener('click', () => {
+      adminPanelModal.classList.remove('open');
+    });
+
+    async function loadSystemUsers() {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">იტვირთება...</td></tr>';
+      try {
+        const res = await fetch('/api/admin/users', {
+          headers: { 'x-auth-token': authToken }
+        });
+        const data = await res.json();
+        if (!data.ok || !data.users) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--danger); padding: 20px;">შეცდომა: ${escapeHtml(data.error || 'ვერ ჩაიტვირთა')}</td></tr>`;
+          return;
+        }
+
+        const roleBadges = {
+          'admin': '<span class="role-badge role-admin">👑 ადმინი</span>',
+          'premium': '<span class="role-badge role-premium">⭐ პრემიუმი</span>',
+          'standard': '<span class="role-badge role-standard">👤 ჩვეულებრივი</span>'
+        };
+
+        tbody.innerHTML = data.users.map(u => {
+          const isMasterAdmin = u.username.toLowerCase() === 'lucasmshvidobadze';
+          const isActive = u.status === 'active';
+          const statusBadge = isActive
+            ? '<span style="color:#10b981; font-weight:800;">● აქტიური</span>'
+            : '<span style="color:#ef4444; font-weight:800;">● დაბლოკილი</span>';
+
+          const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('ka-GE') : '—';
+
+          return `
+            <tr>
+              <td class="mono">#${u.id}</td>
+              <td><strong>${escapeHtml(u.username)}</strong></td>
+              <td>${escapeHtml(u.display_name || '—')}</td>
+              <td>${roleBadges[u.role] || u.role}</td>
+              <td>${statusBadge}</td>
+              <td>${dateStr}</td>
+              <td><small style="color:var(--text-muted);">${escapeHtml(u.notes || '—')}</small></td>
+              <td style="text-align: right;">
+                <div style="display:inline-flex; gap:6px;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="promptResetPassword(${u.id}, '${escapeHtml(u.username)}')">🔑 პაროლი</button>
+                  ${!isMasterAdmin ? `
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="toggleUserStatus(${u.id})">
+                      ${isActive ? '🚫 დაბლოკვა' : '✅ განბლოკვა'}
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="deleteUserAccount(${u.id}, '${escapeHtml(u.username)}')">🗑️</button>
+                  ` : '<small style="color:var(--gold-light); font-weight:700;">მთავარი</small>'}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--danger); padding: 20px;">სერვერთან კავშირის შეცდომა</td></tr>`;
+      }
+    }
+
+    document.getElementById('refreshUsersBtn').addEventListener('click', loadSystemUsers);
+
+    // Create User Form Submission
+    document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const feedback = document.getElementById('createUserFeedback');
+      feedback.style.color = 'var(--gold-light)';
+      feedback.textContent = 'იქმნება ახალი მომხმარებელი...';
+
+      const payload = {
+        username: document.getElementById('newUsername').value.trim(),
+        password: document.getElementById('newUserPass').value.trim(),
+        role: document.getElementById('newUserRole').value,
+        display_name: document.getElementById('newUserDisplayName').value.trim(),
+        notes: document.getElementById('newUserNotes').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/admin/users/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': authToken
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          feedback.style.color = 'var(--success)';
+          feedback.textContent = `მომხმარებელი "${payload.username}" წარმატებით შეიქმნა!`;
+          document.getElementById('newUsername').value = '';
+          document.getElementById('newUserPass').value = '';
+          document.getElementById('newUserDisplayName').value = '';
+          document.getElementById('newUserNotes').value = '';
+          loadSystemUsers();
+        } else {
+          feedback.style.color = 'var(--danger)';
+          feedback.textContent = 'შეცდომა: ' + (data.error || 'ვერ შეიქმნა');
+        }
+      } catch (err) {
+        feedback.style.color = 'var(--danger)';
+        feedback.textContent = 'სერვერთან კავშირის შეცდომა!';
+      }
+    });
+
+    window.toggleUserStatus = async function(id) {
+      try {
+        const res = await fetch('/api/admin/users/toggle-status', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': authToken
+          },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          loadSystemUsers();
+        } else {
+          alert('შეცდომა: ' + (data.error || 'ვერ შესრულდა'));
+        }
+      } catch (e) {
+        alert('სერვერთან კავშირის შეცდომა');
+      }
+    };
+
+    window.deleteUserAccount = async function(id, name) {
+      if (!confirm(`ნამდვილად გსურთ მომხმარებლის "${name}" წაშლა?`)) return;
+      try {
+        const res = await fetch('/api/admin/users/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': authToken
+          },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          loadSystemUsers();
+        } else {
+          alert('შეცდომა: ' + (data.error || 'ვერ წაიშალა'));
+        }
+      } catch (e) {
+        alert('სერვერთან კავშირის შეცდომა');
+      }
+    };
+
+    window.promptResetPassword = async function(id, name) {
+      const newPass = prompt(`შეიყვანეთ ახალი პაროლი მომხმარებლისთვის "${name}":`);
+      if (!newPass || newPass.trim().length < 4) {
+        if (newPass !== null) alert('პაროლი უნდა იყოს მინიმუმ 4 სიმბოლო!');
+        return;
+      }
+      try {
+        const res = await fetch('/api/admin/users/reset-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': authToken
+          },
+          body: JSON.stringify({ id, password: newPass.trim() })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          alert(`მომხმარებლის "${name}" პაროლი წარმატებით შეიცვალა!`);
+        } else {
+          alert('შეცდომა: ' + (data.error || 'ვერ შეიცვალა'));
+        }
+      } catch (e) {
+        alert('სერვერთან კავშირის შეცდომა');
+      }
+    };
+
+    // ==========================================
+    // SEARCH & DATA HANDLING
+    // ==========================================
     const qInput = document.getElementById('qInput');
     const saxeliInput = document.getElementById('saxeliInput');
     const gvariInput = document.getElementById('gvariInput');
@@ -1295,140 +1785,37 @@
     const prevPageBtn = document.getElementById('prevPageBtn');
     const nextPageBtn = document.getElementById('nextPageBtn');
     const pageIndicator = document.getElementById('pageIndicator');
-    const adminBadge = document.getElementById('adminBadge');
 
-    function updateAdminUIState() {
-      if (adminToken) {
-        adminBadge.classList.add('visible');
-        document.getElementById('editInAdminFromModalBtn').style.display = 'inline-flex';
-      } else {
-        adminBadge.classList.remove('visible');
-        document.getElementById('editInAdminFromModalBtn').style.display = 'none';
-      }
-    }
-    updateAdminUIState();
-
-    // Eye toggle buttons in Login Modal
-    document.getElementById('toggleUserVisBtn').addEventListener('click', () => {
-      const inp = document.getElementById('adminUserInp');
-      inp.type = inp.type === 'password' ? 'text' : 'password';
-    });
-
-    document.getElementById('togglePassVisBtn').addEventListener('click', () => {
-      const inp = document.getElementById('adminPassInp');
-      inp.type = inp.type === 'password' ? 'text' : 'password';
-    });
-
-    // 3 Rapid Clicks on MIA Logo -> Open Admin Login / Admin Panel
-    let logoClickTimes = [];
-    document.getElementById('miaLogo').addEventListener('click', () => {
-      const now = Date.now();
-      logoClickTimes.push(now);
-      logoClickTimes = logoClickTimes.filter(t => now - t < 1100);
-      if (logoClickTimes.length >= 3) {
-        logoClickTimes = [];
-        if (adminToken) {
-          openAdminPanel();
-        } else {
-          const uInp = document.getElementById('adminUserInp');
-          const pInp = document.getElementById('adminPassInp');
-          uInp.type = 'password';
-          pInp.type = 'password';
-          uInp.value = '';
-          pInp.value = '';
-          document.getElementById('adminLoginError').style.display = 'none';
-          document.getElementById('adminLoginModal').classList.add('open');
-          setTimeout(() => uInp.focus(), 60);
-        }
-      }
-    });
-
-    adminBadge.addEventListener('click', () => {
-      if (adminToken) openAdminPanel();
-    });
-
-    document.getElementById('closeLoginModalBtn').addEventListener('click', () => {
-      document.getElementById('adminLoginModal').classList.remove('open');
-    });
-
-    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('adminUserInp').value;
-      const password = document.getElementById('adminPassInp').value;
-      const errEl = document.getElementById('adminLoginError');
-      errEl.style.display = 'none';
-
-      try {
-        const res = await fetch('/api/admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (data.ok && data.token) {
-          adminToken = data.token;
-          sessionStorage.setItem('mia_admin_token', adminToken);
-          updateAdminUIState();
-          document.getElementById('adminLoginModal').classList.remove('open');
-          openAdminPanel();
-          renderTable(lastRows);
-        } else {
-          errEl.textContent = data.error || 'ავტორიზაცია ვერ მოხერხდა';
-          errEl.style.display = 'block';
-        }
-      } catch (err) {
-        errEl.textContent = 'შეცდომა სერვერთან დაკავშირებისას';
-        errEl.style.display = 'block';
-      }
-    });
-
-    document.getElementById('logoutAdminBtn').addEventListener('click', () => {
-      adminToken = '';
-      sessionStorage.removeItem('mia_admin_token');
-      updateAdminUIState();
-      document.getElementById('adminPanelModal').classList.remove('open');
-      renderTable(lastRows);
-    });
-
-    document.getElementById('closeAdminPanelBtn').addEventListener('click', () => {
-      document.getElementById('adminPanelModal').classList.remove('open');
-    });
-
-    function getPersonAvatar(row) {
-      if (row.photo_url) return row.photo_url;
-      return String(row.sqesi) === '2' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
+    function escapeHtml(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function formatDateGeo(raw) {
       if (!raw) return { formatted: '—', raw: '' };
       const clean = raw.replace(' 00:00:00', '').trim();
       const m = clean.match(/^(\d{2})\/(\d{2})\/(\d{2,4})$/);
-      if (!m) return { formatted: clean, raw };
+      if (!m) return { formatted: clean, raw: clean };
       let year = m[3];
       if (year.length === 2) {
         year = parseInt(year, 10) > 15 ? '19' + year : '20' + year;
       }
-      return { formatted: `${m[2]}.${m[1]}.${year}`, raw: clean };
+      return {
+        formatted: `${m[2]}.${m[1]}.${year}`,
+        raw: clean
+      };
     }
 
-    function formatSqesi(val) {
-      if (val === '1' || val === 1) return '<span class="badge badge-male">მამრობითი (1)</span>';
-      if (val === '2' || val === 2) return '<span class="badge badge-female">მდედრობითი (2)</span>';
-      return `<span class="badge">${escapeHtml(String(val || '—'))}</span>`;
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    function getPersonAvatar(row) {
+      if (row.photo_url) return row.photo_url;
+      return String(row.sqesi) === '2' ? DEFAULT_AVATAR_FEMALE : DEFAULT_AVATAR_MALE;
     }
 
     async function performSearch(offset = 0) {
+      if (!authToken) return;
       currentOffset = offset;
-      selectedRowId = null;
+      resultsSummary.innerHTML = 'მიმდინარეობს ძებნა...';
+
       const params = new URLSearchParams();
       if (qInput.value.trim()) params.set('q', qInput.value.trim());
       if (saxeliInput.value.trim()) params.set('saxeli', saxeliInput.value.trim());
@@ -1439,83 +1826,99 @@
       if (raioniInput.value.trim()) params.set('raioni', raioniInput.value.trim());
       if (dabInput.value.trim()) params.set('dab_weli', dabInput.value.trim());
       if (mocmobisInput.value.trim()) params.set('mocmobis', mocmobisInput.value.trim());
-      if (sqesiInput.value) params.set('sqesi', sqesiInput.value);
-      params.set('limit', PAGE_SIZE);
-      params.set('offset', currentOffset);
+      if (sqesiInput.value.trim()) params.set('sqesi', sqesiInput.value.trim());
 
-      resultsBody.innerHTML = '<tr><td colspan="10" class="empty-state">მიმდინარეობს ძებნა შსს ბაზაში...</td></tr>';
+      params.set('limit', String(PAGE_SIZE));
+      params.set('offset', String(offset));
 
       try {
-        const res = await fetch('/api/search?' + params.toString());
-        const data = await res.json();
-        if (data.totalRecordsInDb) {
-          document.getElementById('totalRecordsCount').textContent = data.totalRecordsInDb.toLocaleString();
+        const res = await fetch('/api/search?' + params.toString(), {
+          headers: { 'x-auth-token': authToken }
+        });
+        if (res.status === 401) {
+          setAuthState('', null);
+          return;
         }
+
+        const data = await res.json();
         lastRows = data.rows || [];
+        document.getElementById('totalRecordsCount').textContent = (data.totalRecordsInDb || 4934864).toLocaleString();
+
+        const count = data.count || 0;
+        const ms = data.elapsedMs || 0;
+        resultsSummary.innerHTML = `მოიძებნა: <strong>${count}</strong> ჩანაწერი (${ms} მილიწამში) | ნაჩვენებია ${offset + 1}–${offset + count}`;
+
         renderTable(lastRows);
 
-        const pageNum = Math.floor(currentOffset / PAGE_SIZE) + 1;
+        prevPageBtn.disabled = offset === 0;
+        nextPageBtn.disabled = count < PAGE_SIZE;
+        const pageNum = Math.floor(offset / PAGE_SIZE) + 1;
         pageIndicator.textContent = `გვერდი ${pageNum}`;
-        prevPageBtn.disabled = currentOffset === 0;
-        nextPageBtn.disabled = lastRows.length < PAGE_SIZE;
-
-        resultsSummary.innerHTML = `ნაპოვნია <strong>${lastRows.length}</strong> ჩანაწერი მიმდინარე გვერდზე (დრო: <strong>${data.elapsedMs} მწმ</strong>) — დააწკაპუნეთ პიროვნებას <strong>„სრულად ნახვა“</strong> ფაილის გასახსნელად`;
       } catch (err) {
-        resultsBody.innerHTML = `<tr><td colspan="10" class="empty-state">შეცდომა: ${escapeHtml(err.message)}</td></tr>`;
+        resultsSummary.innerHTML = `<span style="color:var(--danger)">შეცდომა ძებნისას: ${escapeHtml(err.message)}</span>`;
       }
     }
 
     function renderTable(rows) {
       if (!rows || rows.length === 0) {
-        resultsBody.innerHTML = '<tr><td colspan="10" class="empty-state">ჩანაწერები ვერ მოიძებნა.</td></tr>';
+        resultsBody.innerHTML = `
+          <tr>
+            <td colspan="10" style="text-align: center; padding: 48px; color: var(--text-muted);">
+              მონაცემები ამ პარამეტრებით ვერ მოიძებნა
+            </td>
+          </tr>
+        `;
         return;
       }
 
       const htmlParts = [];
+      const isAdmin = currentUser && currentUser.role === 'admin';
+
       for (const r of rows) {
-        const dab = formatDateGeo(r.dab_weli);
         const avatar = getPersonAvatar(r);
+        const dab = formatDateGeo(r.dab_weli);
+        const sqesiText = String(r.sqesi) === '1' ? 'მამრ' : (String(r.sqesi) === '2' ? 'მდედრ' : (r.sqesi || '—'));
         const isSelected = selectedRowId === r.id;
 
         htmlParts.push(`
-          <tr data-id="${r.id}" class="${isSelected ? 'selected-row' : ''}">
-            <td style="color: var(--text-muted); font-size: 0.8rem;">#${r.id}</td>
+          <tr data-id="${r.id}" style="${isSelected ? 'background: #0d1e38;' : ''}">
+            <td class="mono" style="color: var(--gold-light);">#${r.id}</td>
             <td>
               <div class="person-identity-cell">
                 <img src="${escapeHtml(avatar)}" alt="ფოტო" class="person-thumb" />
-                <div class="person-names">
-                  <span class="full-name">${escapeHtml(r.saxeli || '—')} ${escapeHtml(r.gvari || '—')}</span>
-                  <span class="father-sub">მამა: ${escapeHtml(r.mamis_saxeli || '—')} ${escapeHtml(r.gvari || '')}</span>
+                <div>
+                  <div style="font-weight: 800; font-size: 0.95rem; color: #fff;">
+                    ${escapeHtml(r.saxeli || '')} ${escapeHtml(r.gvari || '')}
+                  </div>
+                  ${r.phone ? `<div style="font-size: 0.78rem; color: #6ee7b7; margin-top: 2px;">📞 ${escapeHtml(r.phone)}</div>` : ''}
                 </div>
               </div>
             </td>
-            <td class="mono">${escapeHtml(r.piradi || '—')}</td>
-            <td>
-              <strong>${escapeHtml(dab.formatted)}</strong>
-              ${dab.raw ? `<span class="date-sub">${escapeHtml(r.dab_weli)}</span>` : ''}
-            </td>
-            <td>${formatSqesi(r.sqesi)}</td>
-            <td>
-              ${r.phone ? `<span class="badge badge-phone">${ICON_PHONE} ${escapeHtml(r.phone)}</span>` : '<span style="color: var(--text-muted);">—</span>'}
+            <td class="mono">
+              <strong>${escapeHtml(r.piradi || '—')}</strong>
             </td>
             <td>
-              <span class="clickable-filter" data-filter-quca="${escapeHtml(r.quca || '')}" title="ამ მისამართზე რეგისტრირებული ყველა პირის ნახვა">
+              <span class="clickable-filter" data-filter-mamis="${escapeHtml(r.mamis_saxeli || '')}">
+                ${escapeHtml(r.mamis_saxeli || '—')}
+              </span>
+              <span style="color: var(--text-muted); font-size: 0.8rem;">${escapeHtml(r.gvari || '')}</span>
+            </td>
+            <td>${escapeHtml(dab.formatted)}</td>
+            <td>${sqesiText}</td>
+            <td>
+              <span class="clickable-filter" data-filter-quca="${escapeHtml(r.quca || '')}">
                 ${escapeHtml(r.quca || '—')}
               </span>
-              ${r.actual_address ? `<div style="font-size: 0.78rem; color: #6ee7b7; margin-top: 3px; display: flex; align-items: center; gap: 4px;">${ICON_HOME} ფაქტ: ${escapeHtml(r.actual_address)}</div>` : ''}
+              ${r.actual_address ? `<div style="font-size: 0.76rem; color: #6ee7b7; margin-top: 2px;">📍 ${escapeHtml(r.actual_address)}</div>` : ''}
             </td>
             <td>${escapeHtml(r.raioni || '—')}</td>
-            <td>
-              <span class="clickable-filter" data-filter-mocmobis="${escapeHtml(r.mocmobis || '')}">
-                ${escapeHtml(r.mocmobis || '—')}
-              </span>
-            </td>
-            <td>
-              <div style="display: flex; gap: 6px; align-items: center;">
+            <td>${escapeHtml(r.mocmobis || '—')}</td>
+            <td style="text-align: right;">
+              <div style="display: inline-flex; gap: 6px;">
                 <button type="button" class="btn btn-gold btn-sm" data-open-dossier="${r.id}">
-                  ${ICON_FILE} სრულად ნახვა
+                  📄 სრულად ნახვა
                 </button>
-                ${adminToken ? `<button type="button" class="btn btn-secondary btn-sm" data-edit-admin="${r.id}" title="ადმინ პანელში რედაქტირება">${ICON_EDIT}</button>` : ''}
+                ${isAdmin ? `<button type="button" class="btn btn-secondary btn-sm" data-edit-admin="${r.id}" title="რედაქტირება">✏️</button>` : ''}
               </div>
             </td>
           </tr>
@@ -1526,25 +1929,25 @@
             <tr class="expand-action-row">
               <td colspan="10">
                 <div class="expand-action-bar">
-                  <div style="display: flex; align-items: center; gap: 14px;">
+                  <div style="display: flex; align-items: center; gap: 12px;">
                     <img src="/logo.jpg" alt="შსს" style="width: 38px; height: 38px; border-radius: 6px; border: 1px solid var(--gold);" />
                     <div>
-                      <div style="font-weight: 800; color: #fff; font-size: 1rem;">
+                      <div style="font-weight: 800; color: #fff; font-size: 0.98rem;">
                         არჩეულია: ${escapeHtml(r.saxeli || '')} ${escapeHtml(r.gvari || '')} (პ/ნ: ${escapeHtml(r.piradi || '—')})
                       </div>
-                      <div style="font-size: 0.83rem; color: var(--gold-light);">
+                      <div style="font-size: 0.82rem; color: var(--gold-light);">
                         შინაგან საქმეთა სამინისტროს სრული სააღრიცხვო ფაილის და მამის ფოტოს ნახვა
                       </div>
                     </div>
                   </div>
-                  <div style="display: flex; gap: 10px;">
+                  <div style="display: flex; gap: 8px;">
                     <button type="button" class="btn btn-gold" data-open-dossier="${r.id}">
-                      ${ICON_FILE} სრულად ნახვა (შსს ფაილის გახსნა)
+                      📄 სრულად ნახვა
                     </button>
                     <a href="/dossier.html?id=${r.id}" target="_blank" class="btn btn-primary">
-                      ${ICON_PRINT} ცალკე ფაილად გახსნა
+                      🖨️ ცალკე ფაილად (PDF)
                     </a>
-                    ${adminToken ? `<button type="button" class="btn btn-secondary" data-edit-admin="${r.id}">${ICON_EDIT} ადმინში რედაქტირება</button>` : ''}
+                    ${isAdmin ? `<button type="button" class="btn btn-secondary" data-edit-admin="${r.id}">✏️ ადმინში რედაქტირება</button>` : ''}
                   </div>
                 </div>
               </td>
@@ -1556,7 +1959,6 @@
       resultsBody.innerHTML = htmlParts.join('');
     }
 
-    // Table click handler
     resultsBody.addEventListener('click', (e) => {
       const openBtn = e.target.closest('[data-open-dossier]');
       if (openBtn) {
@@ -1570,9 +1972,7 @@
         e.stopPropagation();
         const idNum = parseInt(editBtn.dataset.editAdmin, 10);
         const found = lastRows.find(x => x.id === idNum);
-        if (found) {
-          openAdminPanelWithPerson(found);
-        }
+        if (found) openAdminPanelWithPerson(found);
         return;
       }
 
@@ -1583,17 +1983,6 @@
         saxeliInput.value = '';
         gvariInput.value = '';
         qucaInput.value = qucaEl.dataset.filterQuca;
-        performSearch(0);
-        return;
-      }
-
-      const mocEl = e.target.closest('[data-filter-mocmobis]');
-      if (mocEl && mocEl.dataset.filterMocmobis) {
-        e.stopPropagation();
-        qInput.value = '';
-        saxeliInput.value = '';
-        gvariInput.value = '';
-        mocmobisInput.value = mocEl.dataset.filterMocmobis;
         performSearch(0);
         return;
       }
@@ -1618,7 +2007,9 @@
       document.getElementById('openStandaloneFileBtn').href = `/dossier.html?id=${id}`;
 
       try {
-        const res = await fetch('/api/person?id=' + encodeURIComponent(id));
+        const res = await fetch('/api/person?id=' + encodeURIComponent(id), {
+          headers: { 'x-auth-token': authToken }
+        });
         const data = await res.json();
         const p = data.person;
         if (!p) return;
@@ -1639,25 +2030,25 @@
         document.getElementById('modalFatherName').textContent = `მამა: ${p.mamis_saxeli || '—'} ${p.gvari || ''}`.trim();
 
         const fields = [
-          { label: 'პირადი ნომერი (piadi #)', val: p.piradi || '—' },
-          { label: 'გვარი (gvari)', val: p.gvari || '—' },
-          { label: 'სახელი (saxeli)', val: p.saxeli || '—' },
-          { label: 'მამის სახელი (mamis saxeli)', val: p.mamis_saxeli || '—' },
+          { label: 'პირადი ნომერი', val: p.piradi || '—' },
+          { label: 'გვარი', val: p.gvari || '—' },
+          { label: 'სახელი', val: p.saxeli || '—' },
+          { label: 'მამის სახელი', val: p.mamis_saxeli || '—' },
           { label: 'მამის გვარი', val: p.gvari || '—' },
-          { label: 'დაბადების თარიღი (dab weli)', val: `${dab.formatted} (${p.dab_weli || '—'})` },
-          { label: 'სქესი (sqesi)', val: String(p.sqesi) === '1' ? '1 — მამრობითი' : (String(p.sqesi) === '2' ? '2 — მდედრობითი' : (p.sqesi || '—')) },
+          { label: 'დაბადების თარიღი', val: `${dab.formatted} (${p.dab_weli || '—'})` },
+          { label: 'სქესი', val: String(p.sqesi) === '1' ? 'მამრობითი (1)' : (String(p.sqesi) === '2' ? 'მდედრობითი (2)' : (p.sqesi || '—')) },
           { label: 'მობილურის ნომერი', val: p.phone || 'არ არის მითითებული' },
-          { label: 'იურიდიული მისამართი (quCa)', val: p.quca || '—' },
+          { label: 'იურიდიული მისამართი (ქუჩა)', val: p.quca || '—' },
           { label: 'ფაქტობრივი მისამართი', val: p.actual_address || p.quca || '—' },
-          { label: 'რაიონი (raioni)', val: p.raioni || '—' },
-          { label: 'მოწმობის ნომერი (mocmobis #)', val: p.mocmobis || '—' },
-          { label: 'რეგისტრაციის თარიღი (reg TariRi)', val: p.reg_tarigi ? `${reg.formatted} (${p.reg_tarigi})` : '—' },
+          { label: 'რაიონი / ქალაქი', val: p.raioni || '—' },
+          { label: 'მოწმობის ნომერი', val: p.mocmobis || '—' },
+          { label: 'რეგისტრაციის თარიღი', val: p.reg_tarigi ? `${reg.formatted} (${p.reg_tarigi})` : '—' },
           { label: 'დამატებითი კოდი (DMONAC)', val: p.dmonac || '—' },
           { label: 'სამუშაო ადგილი', val: p.workplace || '—' },
           { label: 'ავტომობილი', val: p.vehicle || '—' },
           { label: 'სტატუსი', val: p.status_note || 'აქტიური' },
           { label: 'შენიშვნები', val: p.notes || '—' },
-          { label: 'ბაზის #ID', val: '#' + p.id }
+          { label: 'ბაზის ID', val: '#' + p.id }
         ];
 
         grid.innerHTML = fields.map(f => `
@@ -1673,10 +2064,10 @@
             const cDab = formatDateGeo(c.dab_weli);
             const cAvatar = getPersonAvatar(c);
             return `
-              <tr onclick="openPersonModal(${c.id})">
+              <tr onclick="openPersonModal(${c.id})" style="cursor: pointer;">
                 <td>
                   <div class="person-identity-cell">
-                    <img src="${escapeHtml(cAvatar)}" class="person-thumb" style="width: 36px; height: 42px;" />
+                    <img src="${escapeHtml(cAvatar)}" class="person-thumb" style="width: 32px; height: 38px;" />
                     <strong>${escapeHtml(c.saxeli || '—')} ${escapeHtml(c.gvari || '—')}</strong>
                   </div>
                 </td>
@@ -1684,7 +2075,7 @@
                 <td>${escapeHtml(c.mamis_saxeli || '—')} ${escapeHtml(c.gvari || '')}</td>
                 <td>${escapeHtml(cDab.formatted)}</td>
                 <td>${escapeHtml(c.mocmobis || '—')}</td>
-                <td><span style="color: var(--gold-light); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">${ICON_FILE} სრულად ნახვა</span></td>
+                <td><span style="color: var(--gold-light); font-weight: 700;">📄 ნახვა</span></td>
               </tr>
             `;
           }).join('');
@@ -1694,67 +2085,23 @@
       }
     }
 
-    document.getElementById('editInAdminFromModalBtn').addEventListener('click', () => {
-      if (currentModalPerson) {
-        document.getElementById('personModal').classList.remove('open');
-        openAdminPanelWithPerson(currentModalPerson);
-      }
-    });
-
     document.getElementById('closeModalBtn').addEventListener('click', () => {
       document.getElementById('personModal').classList.remove('open');
     });
 
-    // Admin Panel Functions
+    // ==========================================
+    // PERSON DATA ENRICHMENT (ADMIN FORM)
+    // ==========================================
     let stagedPersonPhotoData = undefined;
     let stagedFatherPhotoData = undefined;
 
-    function openAdminPanel() {
-      document.getElementById('adminPanelModal').classList.add('open');
-      if (currentModalPerson) {
-        populateAdminForm(currentModalPerson);
-      } else if (selectedRowId) {
-        const found = lastRows.find(r => r.id === selectedRowId);
-        if (found) populateAdminForm(found);
-      } else if (document.getElementById('admId').value === '0') {
-        resetAdminFormForNew();
-      }
-    }
-
-    function openAdminPanelWithPerson(person) {
-      document.getElementById('adminPanelModal').classList.add('open');
-      populateAdminForm(person);
-    }
-
-    function resetAdminFormForNew() {
-      stagedPersonPhotoData = undefined;
-      stagedFatherPhotoData = undefined;
-      document.getElementById('admId').value = '0';
-      document.getElementById('admEditingStatus').textContent = 'ახალი პიროვნების დამატება ბაზაში (ან მოძებნეთ არსებული პიროვნება ზემოთ)';
-      document.getElementById('admPhotoPreview').src = DEFAULT_AVATAR_MALE;
-      document.getElementById('admFatherPhotoPreview').src = DEFAULT_AVATAR_MALE;
-      document.getElementById('admPhotoFile').value = '';
-      document.getElementById('admFatherPhotoFile').value = '';
-      document.getElementById('admPhotoUrl').value = '';
-      document.getElementById('admFatherPhotoUrl').value = '';
-      document.getElementById('admSaxeli').value = '';
-      document.getElementById('admGvari').value = '';
-      document.getElementById('admMamis').value = '';
-      document.getElementById('admPiradi').value = '';
-      document.getElementById('admPhone').value = '';
-      document.getElementById('admDab').value = '';
-      document.getElementById('admQuca').value = '';
-      document.getElementById('admActualAddress').value = '';
-      document.getElementById('admRaioni').value = '';
-      document.getElementById('admSqesi').value = '1';
-      document.getElementById('admMocmobis').value = '';
-      document.getElementById('admReg').value = '';
-      document.getElementById('admDmonac').value = '';
-      document.getElementById('admWorkplace').value = '';
-      document.getElementById('admVehicle').value = '';
-      document.getElementById('admStatusNote').value = '';
-      document.getElementById('admNotes').value = '';
-      document.getElementById('admSaveFeedback').textContent = '';
+    function openAdminPanelWithPerson(p) {
+      openAdminPanel();
+      tabButtons.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      document.querySelector('[data-tab="recordsTab"]').classList.add('active');
+      document.getElementById('recordsTab').classList.add('active');
+      populateAdminForm(p);
     }
 
     function populateAdminForm(p) {
@@ -1787,8 +2134,6 @@
       document.getElementById('admNotes').value = p.notes || '';
       document.getElementById('admSaveFeedback').textContent = '';
     }
-
-    document.getElementById('newPersonAdminBtn').addEventListener('click', resetAdminFormForNew);
 
     document.getElementById('admPhotoFile').addEventListener('change', (e) => {
       const file = e.target.files[0];
@@ -1824,6 +2169,14 @@
       document.getElementById('admFatherPhotoPreview').src = val || DEFAULT_AVATAR_MALE;
     });
 
+    document.getElementById('adminSearchBtn').addEventListener('click', searchInsideAdmin);
+    document.getElementById('adminSearchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchInsideAdmin();
+      }
+    });
+
     async function searchInsideAdmin() {
       const q = document.getElementById('adminSearchInput').value.trim();
       if (!q) return;
@@ -1831,7 +2184,9 @@
       box.style.display = 'block';
       box.innerHTML = '<div style="padding: 8px; color: var(--text-muted);">მიმდინარეობს ძებნა...</div>';
 
-      const res = await fetch('/api/search?limit=15&q=' + encodeURIComponent(q));
+      const res = await fetch('/api/search?limit=15&q=' + encodeURIComponent(q), {
+        headers: { 'x-auth-token': authToken }
+      });
       const data = await res.json();
       const rows = data.rows || [];
       if (rows.length === 0) {
@@ -1861,14 +2216,6 @@
       });
     }
 
-    document.getElementById('adminSearchBtn').addEventListener('click', searchInsideAdmin);
-    document.getElementById('adminSearchInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        searchInsideAdmin();
-      }
-    });
-
     document.getElementById('adminPersonForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const feedback = document.getElementById('admSaveFeedback');
@@ -1896,25 +2243,21 @@
         notes: document.getElementById('admNotes').value.trim()
       };
 
-      if (stagedPersonPhotoData !== undefined) {
-        payload.photo_data = stagedPersonPhotoData;
-      }
-      if (stagedFatherPhotoData !== undefined) {
-        payload.father_photo_data = stagedFatherPhotoData;
-      }
+      if (stagedPersonPhotoData !== undefined) payload.photo_data = stagedPersonPhotoData;
+      if (stagedFatherPhotoData !== undefined) payload.father_photo_data = stagedFatherPhotoData;
 
       try {
         const res = await fetch('/api/admin/save-person', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-admin-token': adminToken
+            'x-auth-token': authToken
           },
           body: JSON.stringify(payload)
         });
         const data = await res.json();
         if (data.ok && data.person) {
-          feedback.style.color = 'var(--accent)';
+          feedback.style.color = '#10b981';
           feedback.textContent = 'მონაცემები და ფოტოები წარმატებით შეინახა ბაზაში!';
           populateAdminForm(data.person);
           performSearch(currentOffset);
@@ -1971,8 +2314,6 @@
       a.click();
       URL.revokeObjectURL(url);
     });
-
-    performSearch(0);
   </script>
 </body>
 </html>
