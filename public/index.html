@@ -1059,7 +1059,7 @@
 
     @media (max-width: 640px) {
       .container {
-        padding: 10px 10px 30px;
+        padding: 8px 8px 30px;
       }
       .header {
         padding: 12px 14px;
@@ -1073,10 +1073,10 @@
         height: 44px;
       }
       .header-title h1 {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
       }
       .header-title p {
-        font-size: 0.74rem;
+        font-size: 0.72rem;
       }
       .header-right {
         flex-direction: column;
@@ -1094,46 +1094,84 @@
       .quick-search-row .btn {
         width: 100%;
         justify-content: center;
+        padding: 12px;
       }
       .fields-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .field-group input,
+      .field-group select {
+        padding: 11px 12px;
+        font-size: 0.95rem;
       }
       .auth-box {
-        padding: 24px 16px;
-        border-radius: 12px;
+        width: 94vw;
+        max-width: 380px;
+        padding: 22px 16px;
+        border-radius: 14px;
+        margin: 10px auto;
       }
       .auth-crest-wrap {
-        width: 78px;
-        height: 78px;
+        width: 72px;
+        height: 72px;
+        margin-bottom: 12px;
       }
       .auth-title {
-        font-size: 1.15rem;
+        font-size: 1.12rem;
+      }
+      .auth-subtitle {
+        font-size: 0.76rem;
       }
       .modal {
-        padding: 14px;
-        border-radius: 10px;
+        width: 96vw;
+        max-height: 92vh;
+        padding: 14px 12px;
+        border-radius: 12px;
+        margin: 10px auto;
+      }
+      .modal-backdrop {
+        padding: 8px;
+        align-items: flex-start;
       }
       .admin-modal {
-        padding: 14px;
+        width: 96vw;
+        padding: 14px 12px;
       }
       .admin-tabs-nav {
         flex-direction: column;
+        gap: 6px;
+      }
+      .admin-tab-btn {
+        width: 100%;
+        text-align: center;
       }
       .details-grid {
         grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .table-container {
+        border-radius: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
       table {
+        min-width: 680px;
         font-size: 0.8rem;
       }
       thead th, tbody td {
         padding: 8px 10px;
       }
       .person-thumb {
-        width: 36px;
-        height: 44px;
+        width: 34px;
+        height: 42px;
       }
       .camera-modal {
-        padding: 14px;
+        width: 96vw;
+        padding: 14px 12px;
+      }
+      .camera-stream-wrapper {
+        min-height: 240px;
       }
     }
   </style>
@@ -1728,6 +1766,10 @@
             <div class="field-group">
               <label>მამის სახელი</label>
               <input type="text" id="admMamis" />
+            </div>
+            <div class="field-group">
+              <label style="color: #93c5fd;">მამის პირადი ნომერი (პ/ნ)</label>
+              <input type="text" id="admFatherPiradi" placeholder="მაგ: 01024082071" maxlength="11" />
             </div>
             <div class="field-group">
               <label>პირადი ნომერი</label>
@@ -2511,10 +2553,18 @@
               <strong>${escapeHtml(r.piradi || '—')}</strong>
             </td>
             <td>
-              <span class="clickable-filter" data-filter-mamis="${escapeHtml(r.mamis_saxeli || '')}">
-                ${escapeHtml(r.mamis_saxeli || '—')}
-              </span>
-              <span style="color: var(--text-muted); font-size: 0.8rem;">${escapeHtml(r.gvari || '')}</span>
+              <div>
+                <span class="clickable-filter" data-filter-mamis="${escapeHtml(r.mamis_saxeli || '')}">
+                  ${escapeHtml(r.mamis_saxeli || '—')}
+                </span>
+                <span style="color: var(--text-muted); font-size: 0.8rem;">${escapeHtml(r.gvari || '')}</span>
+              </div>
+              ${r.father_piradi ? `
+                <div style="font-family: monospace; font-size: 0.76rem; color: #93c5fd; margin-top: 3px; display: inline-flex; align-items: center; gap: 4px;">
+                  <span style="color: var(--text-muted); font-size: 0.7rem;">პ/ნ:</span>
+                  <span class="copy-pill" style="cursor: pointer; font-weight: 700; color: #60a5fa;" onclick="event.stopPropagation(); copyPersonalId('${escapeHtml(r.father_piradi)}', this)" title="მამის პირადი ნომრის კოპირება">📋 ${escapeHtml(r.father_piradi)}</span>
+                </div>
+              ` : ''}
             </td>
             <td>${escapeHtml(dab.formatted)}</td>
             <td>${sqesiText}</td>
@@ -2788,14 +2838,19 @@
         document.getElementById('modalPersonPhoto').src = personPhoto;
         document.getElementById('modalPersonName').textContent = `${p.saxeli || ''} ${p.gvari || ''}`.trim();
 
+        const fatherPiradi = p.father_piradi || (data.likelyFather && data.likelyFather.piradi) || '';
         document.getElementById('modalFatherPhoto').src = fatherPhoto;
-        document.getElementById('modalFatherName').textContent = `მამა: ${p.mamis_saxeli || '—'} ${p.gvari || ''}`.trim();
+        document.getElementById('modalFatherName').innerHTML = `
+          <div>მამა: ${escapeHtml(p.mamis_saxeli || '—')} ${escapeHtml(p.gvari || '')}</div>
+          ${fatherPiradi ? `<div style="font-family: monospace; font-size: 0.82rem; color: #60a5fa; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;"><span style="color: var(--text-muted); font-size: 0.74rem;">პ/ნ:</span> <span class="copy-pill" style="cursor: pointer;" onclick="event.stopPropagation(); copyPersonalId('${escapeHtml(fatherPiradi)}', this)" title="მამის პირადი ნომრის კოპირება">📋 ${escapeHtml(fatherPiradi)}</span></div>` : ''}
+        `;
 
         const fields = [
           { label: 'პირადი ნომერი', val: p.piradi || '—' },
           { label: 'გვარი', val: p.gvari || '—' },
           { label: 'სახელი', val: p.saxeli || '—' },
           { label: 'მამის სახელი', val: p.mamis_saxeli || '—' },
+          { label: 'მამის პირადი ნომერი', val: fatherPiradi || '—' },
           { label: 'მამის გვარი', val: p.gvari || '—' },
           { label: 'დაბადების თარიღი', val: `${dab.formatted} (${p.dab_weli || '—'})` },
           { label: 'სქესი', val: String(p.sqesi) === '1' ? 'მამრობითი (1)' : (String(p.sqesi) === '2' ? 'მდედრობითი (2)' : (p.sqesi || '—')) },
@@ -2880,6 +2935,7 @@
       document.getElementById('admSaxeli').value = p.saxeli || '';
       document.getElementById('admGvari').value = p.gvari || '';
       document.getElementById('admMamis').value = p.mamis_saxeli || '';
+      document.getElementById('admFatherPiradi').value = p.father_piradi || '';
       document.getElementById('admPiradi').value = p.piradi || '';
       document.getElementById('admPhone').value = p.phone || '';
       document.getElementById('admDab').value = p.dab_weli || '';
@@ -2989,6 +3045,7 @@
         saxeli: document.getElementById('admSaxeli').value.trim(),
         gvari: document.getElementById('admGvari').value.trim(),
         mamis_saxeli: document.getElementById('admMamis').value.trim(),
+        father_piradi: (document.getElementById('admFatherPiradi') ? document.getElementById('admFatherPiradi').value.trim() : ''),
         piradi: document.getElementById('admPiradi').value.trim(),
         phone: document.getElementById('admPhone').value.trim(),
         dab_weli: document.getElementById('admDab').value.trim(),

@@ -197,6 +197,55 @@ function getNameVariants(name) {
   return Array.from(variants);
 }
 
+function findFatherForPerson(person) {
+  if (!person || !person.mamis_saxeli) return null;
+  const fVars = getNameVariants(person.mamis_saxeli);
+  if (fVars.length === 0) return null;
+  const fPlaceholders = fVars.map(() => '?').join(',');
+
+  // 1. Same address + same surname + male
+  if (person.quca && person.quca.length > 5 && !person.quca.includes('მისამართის გარეშე')) {
+    const cand = db.prepare(`
+      SELECT * FROM records 
+      WHERE quca = ? AND gvari = ? AND sqesi = '1' AND saxeli IN (${fPlaceholders}) AND id != ?
+      LIMIT 1
+    `).get(person.quca, person.gvari, ...fVars, person.id);
+    if (cand) return { father: cand, matchType: 'ზუსტი მისამართი და გვარი' };
+  }
+
+  // 2. Same raioni + same surname + male
+  if (person.raioni && person.raioni.length > 2) {
+    const cand = db.prepare(`
+      SELECT * FROM records 
+      WHERE raioni = ? AND gvari = ? AND sqesi = '1' AND saxeli IN (${fPlaceholders}) AND id != ?
+      ORDER BY dab_weli ASC
+      LIMIT 1
+    `).get(person.raioni, person.gvari, ...fVars, person.id);
+    if (cand) return { father: cand, matchType: 'ერთი რაიონი და გვარი' };
+  }
+
+  // 3. Same surname + male in database
+  const cand = db.prepare(`
+    SELECT * FROM records 
+    WHERE gvari = ? AND sqesi = '1' AND saxeli IN (${fPlaceholders}) AND id != ?
+    ORDER BY dab_weli ASC
+    LIMIT 1
+  `).get(person.gvari, ...fVars, person.id);
+  if (cand) return { father: cand, matchType: 'საერთო ბაზა (გვარი და სახელი)' };
+
+  // 4. Same address + male
+  if (person.quca && person.quca.length > 5 && !person.quca.includes('მისამართის გარეშე')) {
+    const candAddr = db.prepare(`
+      SELECT * FROM records 
+      WHERE quca = ? AND sqesi = '1' AND saxeli IN (${fPlaceholders}) AND id != ?
+      LIMIT 1
+    `).get(person.quca, ...fVars, person.id);
+    if (candAddr) return { father: candAddr, matchType: 'ერთი მისამართი' };
+  }
+
+  return null;
+}
+
 function attachExtrasToRows(rows) {
   if (!rows || rows.length === 0) return [];
   const ids = rows.map(r => r.id);
@@ -206,12 +255,56 @@ function attachExtrasToRows(rows) {
   for (const ex of extrasList) {
     extrasMap.set(ex.record_id, ex);
   }
+
+  const fatherSameAddressStmt = db.prepare(`
+    SELECT records.id, records.piradi, person_extras.photo_url 
+    FROM records 
+    LEFT JOIN person_extras ON records.id = person_extras.record_id 
+    WHERE records.quca = ? AND records.gvari = ? AND records.sqesi = '1' AND records.saxeli = ? AND records.id != ? 
+    LIMIT 1
+  `);
+  const fatherDbStmt = db.prepare(`
+    SELECT records.id, records.piradi, person_extras.photo_url 
+    FROM records 
+    LEFT JOIN person_extras ON records.id = person_extras.record_id 
+    WHERE records.gvari = ? AND records.sqesi = '1' AND records.saxeli = ? AND records.id != ? 
+    LIMIT 1
+  `);
+
   return rows.map(r => {
     const ex = extrasMap.get(r.id) || {};
+
+    let fatherPiradi = '';
+    let fatherId = 0;
+    let autoFatherPhoto = '';
+
+    if (r.mamis_saxeli) {
+      let fMatch = null;
+      if (r.quca && r.quca.length > 5 && !r.quca.includes('მისამართის გარეშე')) {
+        try {
+          fMatch = fatherSameAddressStmt.get(r.quca, r.gvari, r.mamis_saxeli, r.id);
+        } catch (e) {}
+      }
+      if (!fMatch) {
+        try {
+          fMatch = fatherDbStmt.get(r.gvari, r.mamis_saxeli, r.id);
+        } catch (e) {}
+      }
+      if (fMatch) {
+        fatherPiradi = fMatch.piradi || '';
+        fatherId = fMatch.id || 0;
+        autoFatherPhoto = fMatch.photo_url || '';
+      }
+    }
+
+    const fatherPhoto = ex.father_photo_url || autoFatherPhoto || '';
+
     return {
       ...r,
       photo_url: ex.photo_url || '',
-      father_photo_url: ex.father_photo_url || '',
+      father_photo_url: fatherPhoto,
+      father_piradi: fatherPiradi,
+      father_id: fatherId,
       phone: ex.phone || '',
       actual_address: ex.actual_address || '',
       workplace: ex.workplace || '',
@@ -912,6 +1005,31 @@ const server = http.createServer(async (req, res) => {
       `).run(recordId, photoUrl, fatherPhotoUrl, phone, actual_address, workplace, vehicle, status_note, notes, updated_at);
 
       const updatedPerson = attachExtrasToRows([db.prepare('SELECT * FROM records WHERE id = ?').get(recordId)])[0];
+
+      // Auto-sync Father Photo: if fatherPhotoUrl is uploaded or provided, find father's record in DB and set his photo_url!
+      let targetFatherId = parseInt(body.father_id || '0', 10);
+      const targetFatherPiradi = (body.father_piradi || '').trim();
+      if (!targetFatherId && targetFatherPiradi) {
+        const fRow = db.prepare('SELECT id FROM records WHERE piradi = ?').get(targetFatherPiradi);
+        if (fRow) targetFatherId = fRow.id;
+      }
+      if (!targetFatherId && updatedPerson.father_id) {
+        targetFatherId = updatedPerson.father_id;
+      }
+      if (!targetFatherId && updatedPerson.mamis_saxeli) {
+        const match = findFatherForPerson(updatedPerson);
+        if (match && match.father && match.father.id) targetFatherId = match.father.id;
+      }
+      if (targetFatherId && fatherPhotoUrl) {
+        db.prepare(`
+          INSERT INTO person_extras (record_id, photo_url, updated_at)
+          VALUES (?, ?, ?)
+          ON CONFLICT(record_id) DO UPDATE SET
+            photo_url = excluded.photo_url,
+            updated_at = excluded.updated_at
+        `).run(targetFatherId, fatherPhotoUrl, updated_at);
+      }
+
       return sendJson(200, { ok: true, person: updatedPerson });
     }
 
@@ -990,11 +1108,21 @@ const server = http.createServer(async (req, res) => {
         coResidents = attachExtrasToRows(rawCo);
       }
 
-      // Try to find likely father record at same address if mamis_saxeli is known
+      // Try to find likely father record at same address or in database if mamis_saxeli is known
       let likelyFather = null;
       if (person.mamis_saxeli && coResidents.length > 0) {
         const fVars = new Set(getNameVariants(person.mamis_saxeli));
-        likelyFather = coResidents.find(c => fVars.has(c.saxeli) && String(c.sqesi) === '1') || null;
+        const coFather = coResidents.find(c => fVars.has(c.saxeli) && String(c.sqesi) === '1');
+        if (coFather) likelyFather = coFather;
+      }
+      if (!likelyFather && person.mamis_saxeli) {
+        const fMatch = findFatherForPerson(person);
+        if (fMatch && fMatch.father) {
+          likelyFather = attachExtrasToRows([fMatch.father])[0];
+        }
+      }
+      if (likelyFather && !person.father_piradi) {
+        person.father_piradi = likelyFather.piradi || '';
       }
 
       return sendJson(200, { person, coResidents, likelyFather, userRole: session.role });

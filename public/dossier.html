@@ -532,6 +532,7 @@
       const sqesiText = String(p.sqesi) === '1' ? 'მამრობითი (1)' : (String(p.sqesi) === '2' ? 'მდედრობითი (2)' : (p.sqesi || '—'));
       const fatherFirstName = p.mamis_saxeli || (data.likelyFather && data.likelyFather.saxeli) || '—';
       const fatherLastName = p.gvari || (data.likelyFather && data.likelyFather.gvari) || '—';
+      const fatherPiradi = p.father_piradi || (data.likelyFather && data.likelyFather.piradi) || '';
 
       let html = `
         <div class="doc-banner">
@@ -547,11 +548,12 @@
               პერსონალური და სარეგისტრაციო მონაცემები
             </h3>
             <table class="info-table">
-              <tr class="highlight-row"><th>პირადი ნომერი (piadi #)</th><td style="font-family: monospace; font-size: 0.98rem;">${escapeHtml(p.piradi || '—')}</td></tr>
+              <tr class="highlight-row"><th>პირადი ნომერი (piadi #)</th><td style="font-family: monospace; font-size: 0.98rem; font-weight: 800;">${escapeHtml(p.piradi || '—')}</td></tr>
               <tr class="highlight-row"><th>გვარი (gvari)</th><td>${escapeHtml(p.gvari || '—')}</td></tr>
               <tr class="highlight-row"><th>სახელი (saxeli)</th><td>${escapeHtml(p.saxeli || '—')}</td></tr>
               <tr class="highlight-row"><th>მამის სახელი</th><td>${escapeHtml(fatherFirstName)}</td></tr>
               <tr class="highlight-row"><th>მამის გვარი</th><td>${escapeHtml(fatherLastName)}</td></tr>
+              <tr class="highlight-row" style="background: rgba(30, 58, 138, 0.08);"><th>მამის პირადი ნომერი (პ/ნ)</th><td style="font-family: monospace; font-size: 1rem; font-weight: 800; color: #1e3a8a;">${escapeHtml(fatherPiradi || '—')}</td></tr>
               <tr><th>დაბადების თარიღი (dab weli)</th><td>${escapeHtml(formatDateGeo(p.dab_weli))}</td></tr>
               <tr><th>სქესი (sqesi)</th><td>${escapeHtml(sqesiText)}</td></tr>
               <tr><th>მობილურის ნომერი</th><td style="color: #047857; font-weight: 800;">${escapeHtml(p.phone || 'არ არის მითითებული')}</td></tr>
@@ -590,6 +592,7 @@
               <div class="photo-meta">
                 <div><strong>სახელი:</strong> ${escapeHtml(fatherFirstName)}</div>
                 <div><strong>გვარი:</strong> ${escapeHtml(fatherLastName)}</div>
+                <div><strong>მამის პ/ნ:</strong> ${escapeHtml(fatherPiradi || '—')}</div>
                 <div><strong>სტატუსი:</strong> მამა</div>
               </div>
             </div>
