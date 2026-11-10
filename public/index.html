@@ -2,7 +2,7 @@
 <html lang="ka">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link rel="icon" type="image/jpeg" href="/logo.jpg" />
   <title>შინაგან საქმეთა სამინისტრო — ერთიანი მონაცემთა ბაზა</title>
   <style>
@@ -29,6 +29,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -38,6 +39,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
     /* SVG Icons helper */
@@ -93,6 +95,8 @@
       font-size: 0.9rem;
       transition: all 0.15s ease;
       text-decoration: none;
+      min-height: 42px;
+      touch-action: manipulation;
     }
 
     .btn-primary {
@@ -141,8 +145,9 @@
 
     .btn-sm {
       padding: 6px 12px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       border-radius: 6px;
+      min-height: 36px;
     }
 
     /* ============================================================ */
@@ -156,27 +161,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
+      overflow-y: auto;
     }
 
     .auth-box {
       width: 100%;
-      max-width: 460px;
+      max-width: 450px;
       background: rgba(14, 25, 45, 0.95);
       border: 2px solid var(--gold);
       border-radius: 16px;
-      padding: 36px 32px;
+      padding: 34px 28px;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(201, 156, 58, 0.18);
       text-align: center;
       backdrop-filter: blur(10px);
       position: relative;
+      margin: auto;
     }
 
     .auth-crest-wrap {
       position: relative;
-      width: 105px;
-      height: 105px;
-      margin: 0 auto 18px;
+      width: 95px;
+      height: 95px;
+      margin: 0 auto 16px;
     }
 
     .auth-crest-img {
@@ -189,7 +196,7 @@
     }
 
     .auth-title {
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: #ffffff;
       margin-bottom: 4px;
@@ -197,9 +204,9 @@
     }
 
     .auth-subtitle {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--gold-light);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .auth-notice-pill {
@@ -211,9 +218,9 @@
       color: var(--gold-light);
       padding: 6px 14px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .auth-form {
@@ -226,56 +233,70 @@
 
     .auth-form label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 6px;
     }
 
+    /* Fixed Input-with-icon CSS - NO OVERLAP WITH ICONS */
     .input-with-icon {
-      position: relative;
-      display: flex;
-      align-items: center;
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+      width: 100% !important;
     }
 
     .input-with-icon .left-icon {
-      position: absolute;
-      left: 12px;
-      color: var(--gold-light);
-      pointer-events: none;
+      position: absolute !important;
+      left: 14px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      width: 20px !important;
+      height: 20px !important;
+      color: var(--gold-light) !important;
+      pointer-events: none !important;
+      z-index: 5 !important;
     }
 
     .input-with-icon input {
-      width: 100%;
-      padding: 12px 42px 12px 40px;
-      background: #081223;
-      color: #ffffff;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.2s;
+      width: 100% !important;
+      padding-left: 48px !important; /* CRITICAL: 48px guarantees text and placeholder NEVER overlap icon */
+      padding-right: 46px !important;
+      padding-top: 13px !important;
+      padding-bottom: 13px !important;
+      background: #081223 !important;
+      color: #ffffff !important;
+      border: 1.5px solid var(--border) !important;
+      border-radius: 10px !important;
+      font-size: 0.95rem !important;
+      outline: none !important;
+      box-sizing: border-box !important;
+      transition: all 0.2s ease !important;
     }
 
     .input-with-icon input:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 10px rgba(201, 156, 58, 0.35);
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 12px rgba(201, 156, 58, 0.4) !important;
     }
 
     .input-with-icon .right-btn {
-      position: absolute;
-      right: 10px;
-      background: none;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      padding: 6px;
+      position: absolute !important;
+      right: 12px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      background: none !important;
+      border: none !important;
+      color: var(--text-muted) !important;
+      cursor: pointer !important;
+      display: flex !important;
+      align-items: center !important;
+      padding: 6px !important;
+      z-index: 5 !important;
     }
 
     .input-with-icon .right-btn:hover {
-      color: #fff;
+      color: #fff !important;
     }
 
     .auth-error-box {
@@ -323,43 +344,44 @@
       background: linear-gradient(135deg, #091528 0%, #102140 100%);
       border: 1.5px solid var(--gold);
       border-radius: 14px;
-      padding: 16px 24px;
-      margin-bottom: 22px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 14px;
     }
 
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     .mia-logo {
-      width: 60px;
-      height: 60px;
+      width: 56px;
+      height: 56px;
       border-radius: 10px;
       border: 2px solid var(--gold);
       object-fit: cover;
       box-shadow: 0 4px 14px rgba(201, 156, 58, 0.3);
       cursor: pointer;
       transition: transform 0.2s;
+      flex-shrink: 0;
     }
 
     .mia-logo:hover {
-      transform: scale(1.04);
+      transform: scale(1.05);
     }
 
     .header-title h1 {
-      font-size: 1.45rem;
+      font-size: 1.35rem;
       font-weight: 800;
       color: #fff;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
 
     .header-title p {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--gold-light);
       margin-top: 3px;
     }
@@ -367,7 +389,7 @@
     .header-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
@@ -377,9 +399,9 @@
       gap: 8px;
       background: rgba(14, 25, 45, 0.9);
       border: 1px solid var(--border-light);
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 20px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       color: #fff;
     }
 
@@ -387,9 +409,9 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 3px 9px;
+      padding: 3px 8px;
       border-radius: 12px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 800;
       text-transform: uppercase;
     }
@@ -415,12 +437,12 @@
     .stats-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: rgba(15, 23, 42, 0.8);
       border: 1px solid var(--border);
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 20px;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
@@ -433,21 +455,21 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 22px;
-      margin-bottom: 24px;
+      padding: 18px 20px;
+      margin-bottom: 22px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     }
 
     .quick-search-row {
       display: flex;
-      gap: 12px;
-      margin-bottom: 18px;
+      gap: 10px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
     }
 
     .quick-input-wrap {
       flex: 1;
-      min-width: 280px;
+      min-width: 260px;
       position: relative;
     }
 
@@ -467,9 +489,10 @@
       border: 1.5px solid var(--border);
       border-radius: 10px;
       color: #fff;
-      font-size: 0.98rem;
+      font-size: 0.95rem;
       outline: none;
       transition: all 0.2s;
+      box-sizing: border-box;
     }
 
     .quick-input:focus {
@@ -479,13 +502,13 @@
 
     .fields-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 12px;
     }
 
     .field-group label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 4px;
@@ -505,6 +528,7 @@
       font-size: 0.88rem;
       outline: none;
       transition: border-color 0.15s;
+      box-sizing: border-box;
     }
 
     .field-group input:focus,
@@ -520,11 +544,11 @@
       align-items: center;
       margin-bottom: 14px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
     .results-summary {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
     }
 
@@ -539,24 +563,26 @@
       border-radius: 12px;
       overflow-x: auto;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      -webkit-overflow-scrolling: touch;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       text-align: left;
+      min-width: 850px;
     }
 
     thead th {
       background: #091322;
       color: var(--gold-light);
-      padding: 13px 14px;
+      padding: 12px 14px;
       font-weight: 800;
       border-bottom: 2px solid var(--border);
       white-space: nowrap;
       text-transform: uppercase;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       letter-spacing: 0.4px;
     }
 
@@ -577,12 +603,12 @@
     .person-identity-cell {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .person-thumb {
-      width: 44px;
-      height: 52px;
+      width: 42px;
+      height: 50px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid var(--gold);
@@ -619,7 +645,7 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 14px;
+      gap: 12px;
     }
 
     /* Pagination */
@@ -645,7 +671,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 18px;
+      padding: 14px;
       overflow-y: auto;
     }
 
@@ -662,17 +688,18 @@
       overflow-y: auto;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
       position: relative;
+      margin: auto;
     }
 
     /* Full Dossier Modal */
     .dossier-modal {
-      max-width: 1050px;
+      max-width: 1000px;
     }
 
     .mia-file-header {
       background: linear-gradient(135deg, #091528 0%, #172f57 100%);
       border-bottom: 2px solid var(--gold);
-      padding: 18px 24px;
+      padding: 16px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -681,93 +708,94 @@
     }
 
     .mia-file-body {
-      padding: 24px;
+      padding: 20px;
     }
 
     .photos-duo-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      margin-bottom: 24px;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     .photo-card {
       background: var(--surface-card);
       border: 1.5px solid var(--gold);
       border-radius: 12px;
-      padding: 14px;
+      padding: 12px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
 
     .photo-card-img {
-      width: 95px;
-      height: 115px;
+      width: 85px;
+      height: 105px;
       object-fit: cover;
       border-radius: 8px;
       border: 1.5px solid var(--border-light);
       background: #081223;
+      flex-shrink: 0;
     }
 
     .details-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     .detail-box {
       background: #0a1426;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 9px 12px;
     }
 
     .detail-box .label {
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       color: var(--text-muted);
       text-transform: uppercase;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .detail-box .val {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
       color: #fff;
       word-break: break-word;
     }
 
-    /* ============================================================ */
-    /* ADMIN PANEL MODAL                                            */
-    /* ============================================================ */
+    /* Admin Modal */
     .admin-modal {
-      max-width: 1100px;
-      padding: 24px;
+      max-width: 1050px;
+      padding: 22px;
     }
 
     .admin-tabs-nav {
       display: flex;
       gap: 8px;
       border-bottom: 2px solid var(--border);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       padding-bottom: 6px;
+      overflow-x: auto;
     }
 
     .admin-tab-btn {
-      padding: 10px 18px;
+      padding: 9px 16px;
       background: none;
       border: none;
       border-bottom: 3px solid transparent;
       color: var(--text-muted);
       font-weight: 800;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: all 0.2s;
+      white-space: nowrap;
     }
 
     .admin-tab-btn:hover {
@@ -791,35 +819,240 @@
       background: #091426;
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 24px;
+      padding: 18px;
+      margin-bottom: 20px;
     }
 
     .photo-upload-box {
       background: #081223;
       border: 1px dashed var(--gold);
       border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .photo-upload-preview {
-      width: 130px;
-      height: 155px;
+      width: 120px;
+      height: 145px;
       object-fit: cover;
       border-radius: 8px;
       border: 1px solid var(--border);
       background: #081223;
     }
 
-    /* Small prompt modal */
-    .prompt-modal {
-      max-width: 420px;
-      padding: 24px;
+    /* ============================================================ */
+    /* 3. CAMERA & FACE RECOGNITION MODAL (AI BIOMETRIC SCANNER)     */
+    /* ============================================================ */
+    .camera-modal {
+      max-width: 580px;
+      padding: 20px;
+    }
+
+    .camera-stream-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 20px rgba(201, 156, 58, 0.25);
+    }
+
+    #cameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .scanner-hud {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .scanner-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--gold);
+    }
+
+    .corner-tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+    .corner-tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+    .corner-br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+    .scanner-laser {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #10b981, #e5be6b, #10b981, transparent);
+      box-shadow: 0 0 12px #10b981, 0 0 20px #e5be6b;
+      animation: scanLaser 2.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes scanLaser {
+      0% { top: 15%; }
+      100% { top: 85%; }
+    }
+
+    .scanner-hint {
+      position: absolute;
+      bottom: 14px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      padding: 4px 12px;
+      border-radius: 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .camera-upload-box {
+      background: #081223;
+      border: 2px dashed var(--border-light);
+      border-radius: 12px;
+      padding: 28px 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .camera-upload-box:hover {
+      border-color: var(--gold);
+      background: #0c1a30;
+    }
+
+    .biometric-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #081223;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .biometric-progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), #10b981);
+      animation: fillProgress 1.4s ease-in-out infinite;
+    }
+
+    @keyframes fillProgress {
+      0% { width: 10%; }
+      50% { width: 85%; }
+      100% { width: 100%; }
+    }
+
+    /* ============================================================ */
+    /* RESPONSIVE DESIGN (PHONES, TABLETS & COMPACT SCREENS)        */
+    /* ============================================================ */
+    @media (max-width: 900px) {
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 14px;
+      }
+      .header-right {
+        justify-content: space-between;
+        width: 100%;
+      }
+      .photos-duo-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 10px 10px 30px;
+      }
+      .header {
+        padding: 12px 14px;
+        border-radius: 10px;
+      }
+      .header-brand {
+        gap: 10px;
+      }
+      .mia-logo {
+        width: 44px;
+        height: 44px;
+      }
+      .header-title h1 {
+        font-size: 1.1rem;
+      }
+      .header-title p {
+        font-size: 0.74rem;
+      }
+      .header-right {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+      .user-pill, .stats-pill {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .quick-search-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .quick-search-row .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .fields-grid {
+        grid-template-columns: 1fr;
+      }
+      .auth-box {
+        padding: 24px 16px;
+        border-radius: 12px;
+      }
+      .auth-crest-wrap {
+        width: 78px;
+        height: 78px;
+      }
+      .auth-title {
+        font-size: 1.15rem;
+      }
+      .modal {
+        padding: 14px;
+        border-radius: 10px;
+      }
+      .admin-modal {
+        padding: 14px;
+      }
+      .admin-tabs-nav {
+        flex-direction: column;
+      }
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+      table {
+        font-size: 0.8rem;
+      }
+      thead th, tbody td {
+        padding: 8px 10px;
+      }
+      .person-thumb {
+        width: 36px;
+        height: 44px;
+      }
+      .camera-modal {
+        padding: 14px;
+      }
     }
   </style>
 </head>
@@ -945,14 +1178,22 @@
                 type="text"
                 id="qInput"
                 class="quick-input"
-                placeholder="ჩაწერეთ სახელი და გვარი ქართულად (მაგ: გიორგი ქავთარაძე) ან პირადი ნომერი..."
+                placeholder="ჩაწერეთ სახელი და გვარი ქართულად ან პირადი ნომერი..."
                 autocomplete="off"
               />
             </div>
+
             <button type="submit" class="btn btn-primary">
               <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               ძებნა
             </button>
+
+            <!-- Camera / Photo Face Search Trigger Button -->
+            <button type="button" id="openCameraBtn" class="btn btn-gold" title="ფოტოს გადაღება ან ატვირთვა სახის ამოსაცნობად">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              📸 სახით / კამერით ძებნა
+            </button>
+
             <button type="button" id="clearBtn" class="btn btn-secondary">
               <svg class="svg-icon" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
               გასუფთავება
@@ -1060,16 +1301,108 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- 3. OFFICIAL DOSSIER MODAL (FULL VIEW)                         -->
+  <!-- 3. CAMERA & BIOMETRIC FACE RECOGNITION MODAL                 -->
+  <!-- ============================================================ -->
+  <div class="modal-backdrop" id="cameraModal">
+    <div class="modal camera-modal">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="/logo.jpg" alt="შსს" style="width: 42px; height: 42px; border-radius: 8px; border: 1.5px solid var(--gold);" />
+          <div>
+            <h3 style="font-size: 1.15rem; color: #fff; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+              <svg class="svg-icon" viewBox="0 0 24 24" style="color: var(--gold-light);"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              ბიომეტრიული სახის ამოცნობა
+            </h3>
+            <p style="font-size: 0.8rem; color: var(--gold-light);">გადაიღეთ ან ატვირთეთ ფოტო პირის იდენტიფიცირებისთვის</p>
+          </div>
+        </div>
+        <button type="button" id="closeCameraModalBtn" class="btn btn-secondary btn-sm">დახურვა</button>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <button type="button" id="tabLiveCamBtn" class="btn btn-primary btn-sm" style="flex: 1; justify-content: center;">
+          📷 პირდაპირი კამერა (Live Scanner)
+        </button>
+        <button type="button" id="tabUploadPicBtn" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;">
+          📁 ფოტოს ატვირთვა / გალერეა
+        </button>
+      </div>
+
+      <!-- Live Camera Stream -->
+      <div id="liveCamSection">
+        <div class="camera-stream-wrapper">
+          <video id="cameraVideo" autoplay playsinline muted></video>
+          <div class="scanner-hud">
+            <div class="scanner-corner corner-tl"></div>
+            <div class="scanner-corner corner-tr"></div>
+            <div class="scanner-corner corner-bl"></div>
+            <div class="scanner-corner corner-br"></div>
+            <div class="scanner-laser"></div>
+            <div class="scanner-hint">დააფიქსირეთ სახე ცენტრში</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+          <button type="button" id="snapPhotoBtn" class="btn btn-gold" style="flex: 2; justify-content: center;">
+            📸 ფოტოს გადაღება და ამოცნობა
+          </button>
+          <button type="button" id="flipCameraBtn" class="btn btn-secondary" style="flex: 1; justify-content: center;" title="კამერის გადართვა (წინა/უკანა)">
+            🔄 შეცვლა
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Photo Section -->
+      <div id="uploadCamSection" style="display: none;">
+        <div class="camera-upload-box" id="cameraDropZone">
+          <svg class="svg-icon-lg" style="color: var(--gold-light); width: 44px; height: 44px;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem; margin-top: 8px;">დააჭირეთ ფოტოს ასარჩევად</div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">JPG, PNG, WebP ან პირდაპირ გადაიღეთ ტელეფონით</p>
+          <input type="file" id="cameraFileInput" accept="image/*" capture="environment" style="display: none;" />
+          <button type="button" id="triggerFileSelectBtn" class="btn btn-primary btn-sm" style="margin-top: 12px;">
+            📁 ფაილის არჩევა
+          </button>
+          <img id="uploadPreviewImg" src="" alt="ატვირთული ფოტო" style="display: none; max-width: 100%; max-height: 220px; border-radius: 8px; margin-top: 12px; border: 1.5px solid var(--gold);" />
+        </div>
+
+        <button type="button" id="analyzeUploadedBtn" class="btn btn-gold" style="width: 100%; margin-top: 14px; justify-content: center; display: none;">
+          🔍 ატვირთული ფოტოს ამოცნობა
+        </button>
+      </div>
+
+      <!-- Hidden Offscreen Canvas for Snapshot Capture -->
+      <canvas id="cameraCanvas" style="display: none;"></canvas>
+
+      <!-- Scan Progress / Loading Bar -->
+      <div id="cameraLoadingState" style="display: none; text-align: center; padding: 20px 10px;">
+        <div style="font-weight: 800; font-size: 0.98rem; color: var(--gold-light); margin-bottom: 8px;">
+          ⚡ მიმდინარეობს ბიომეტრიული ანალიზი და სახის ამოცნობა...
+        </div>
+        <div class="biometric-progress-bar">
+          <div class="biometric-progress-fill"></div>
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;">
+          შედარება შინაგან საქმეთა სამინისტროს ცენტრალურ ბაზასთან
+        </div>
+      </div>
+
+      <!-- Match Result Container -->
+      <div id="cameraMatchResult" style="display: none; margin-top: 16px;"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 4. OFFICIAL DOSSIER MODAL (FULL VIEW)                         -->
   <!-- ============================================================ -->
   <div class="modal-backdrop" id="personModal">
     <div class="modal dossier-modal">
       <div class="mia-file-header">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <img src="/logo.jpg" alt="შსს" style="width: 48px; height: 48px; border-radius: 8px; border: 1.5px solid var(--gold);" />
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="/logo.jpg" alt="შსს" style="width: 44px; height: 44px; border-radius: 8px; border: 1.5px solid var(--gold);" />
           <div>
-            <h2 style="font-size: 1.2rem; color: #fff; font-weight: 800;">შინაგან საქმეთა სამინისტრო — პირადი საქმე</h2>
-            <p id="modalSubtitle" style="font-size: 0.82rem; color: var(--gold-light);">ელექტრონული საინფორმაციო ბარათი</p>
+            <h2 style="font-size: 1.18rem; color: #fff; font-weight: 800;">შინაგან საქმეთა სამინისტრო — პირადი საქმე</h2>
+            <p id="modalSubtitle" style="font-size: 0.8rem; color: var(--gold-light);">ელექტრონული საინფორმაციო ბარათი</p>
           </div>
         </div>
         <div style="display: flex; gap: 8px;">
@@ -1087,18 +1420,18 @@
           <div class="photo-card">
             <img id="modalPersonPhoto" src="" alt="პიროვნება" class="photo-card-img" />
             <div>
-              <div style="font-size: 0.76rem; color: var(--gold-light); text-transform: uppercase; font-weight: 800;">პიროვნების ფოტოსურათი</div>
-              <div id="modalPersonName" style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 4px;">—</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">საიდენტიფიკაციო ბარათი</div>
+              <div style="font-size: 0.74rem; color: var(--gold-light); text-transform: uppercase; font-weight: 800;">პიროვნების ფოტოსურათი</div>
+              <div id="modalPersonName" style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 3px;">—</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">საიდენტიფიკაციო ბარათი</div>
             </div>
           </div>
 
           <div class="photo-card">
             <img id="modalFatherPhoto" src="" alt="მამა" class="photo-card-img" />
             <div>
-              <div style="font-size: 0.76rem; color: var(--gold-light); text-transform: uppercase; font-weight: 800;">მამის ფოტოსურათი</div>
-              <div id="modalFatherName" style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-top: 4px;">—</div>
-              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">გენეალოგიური ჩანაწერი</div>
+              <div style="font-size: 0.74rem; color: var(--gold-light); text-transform: uppercase; font-weight: 800;">მამის ფოტოსურათი</div>
+              <div id="modalFatherName" style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 3px;">—</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">გენეალოგიური ჩანაწერი</div>
             </div>
           </div>
         </div>
@@ -1108,7 +1441,7 @@
 
         <!-- Family / Co-Residents -->
         <div id="coResidentsSection" style="margin-top: 18px; display: none;">
-          <h3 style="font-size: 0.95rem; color: var(--gold-light); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+          <h3 style="font-size: 0.92rem; color: var(--gold-light); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
             <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
             ამავე მისამართზე და გვარზე რეგისტრირებული ოჯახის წევრები
           </h3>
@@ -1133,7 +1466,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <!-- 4. ADMIN PANEL MODAL (USER MANAGEMENT & DATA ENRICHMENT)    -->
+  <!-- 5. ADMIN PANEL MODAL (USER MANAGEMENT & DATA ENRICHMENT)    -->
   <!-- ============================================================ -->
   <div class="modal-backdrop" id="adminPanelModal">
     <div class="modal admin-modal">
@@ -1163,11 +1496,8 @@
         </button>
       </div>
 
-      <!-- ============================================== -->
-      <!-- TAB 1: USER ACCOUNTS MANAGEMENT                -->
-      <!-- ============================================== -->
+      <!-- TAB 1: USER ACCOUNTS MANAGEMENT -->
       <div class="admin-tab-content active" id="usersTab">
-
         <!-- Create User Card -->
         <div class="admin-user-card">
           <h3 style="font-size: 1rem; color: var(--gold-light); margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
@@ -1252,15 +1582,10 @@
             </table>
           </div>
         </div>
-
       </div>
 
-      <!-- ============================================== -->
-      <!-- TAB 2: PERSON DATA ENRICHMENT & PHOTOS          -->
-      <!-- ============================================== -->
+      <!-- TAB 2: PERSON DATA ENRICHMENT & PHOTOS -->
       <div class="admin-tab-content" id="recordsTab">
-
-        <!-- Quick Lookup Inside Admin -->
         <div style="background: #081223; border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 18px;">
           <div style="font-size: 0.84rem; font-weight: 700; color: var(--gold-light); margin-bottom: 8px;">
             მოძებნეთ პიროვნება ბაზაში სარედაქტირებლად (სახელი და გვარი, პირადი # ან #ID):
@@ -1285,25 +1610,25 @@
           </div>
 
           <!-- Photo & Father Photo Upload Row -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;" class="photos-duo-container">
             <div class="photo-upload-box">
-              <div style="font-weight: 700; font-size: 0.85rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
+              <div style="font-weight: 700; font-size: 0.82rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
                 <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 პიროვნების ფოტოსურათი
               </div>
               <img id="admPhotoPreview" src="" alt="პიროვნების ფოტო" class="photo-upload-preview" />
-              <input type="file" id="admPhotoFile" accept="image/*" style="font-size: 0.82rem; max-width: 240px;" />
-              <input type="text" id="admPhotoUrl" placeholder="ან ჩასვით ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.83rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
+              <input type="file" id="admPhotoFile" accept="image/*" style="font-size: 0.8rem; max-width: 240px;" />
+              <input type="text" id="admPhotoUrl" placeholder="ან ჩასვით ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.82rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
             </div>
 
             <div class="photo-upload-box">
-              <div style="font-weight: 700; font-size: 0.85rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
+              <div style="font-weight: 700; font-size: 0.82rem; color: var(--gold-light); display: flex; align-items: center; gap: 6px;">
                 <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                 მამის ფოტოსურათი
               </div>
               <img id="admFatherPhotoPreview" src="" alt="მამის ფოტო" class="photo-upload-preview" />
-              <input type="file" id="admFatherPhotoFile" accept="image/*" style="font-size: 0.82rem; max-width: 240px;" />
-              <input type="text" id="admFatherPhotoUrl" placeholder="ან ჩასვით მამის ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.83rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
+              <input type="file" id="admFatherPhotoFile" accept="image/*" style="font-size: 0.8rem; max-width: 240px;" />
+              <input type="text" id="admFatherPhotoUrl" placeholder="ან ჩასვით მამის ფოტოს ლინკი (URL)..." style="width: 100%; padding: 7px 10px; font-size: 0.82rem; background: var(--surface); color: #fff; border: 1px solid var(--border); border-radius: 6px;" />
             </div>
           </div>
 
@@ -1382,7 +1707,7 @@
             <textarea id="admNotes" rows="2" placeholder="შეიყვანეთ დამატებითი ინფორმაცია..."></textarea>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div id="admSaveFeedback" style="font-weight: 700; font-size: 0.92rem;"></div>
             <button type="submit" class="btn btn-gold">
               <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -1391,7 +1716,6 @@
           </div>
         </form>
       </div>
-
     </div>
   </div>
 
@@ -1422,7 +1746,7 @@
 
     const DEFAULT_AVATAR_FEMALE = "data:image/svg+xml;utf8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
-        <rect width="200" height="240" fill="#4c3d6e"/>
+        <rect width="200" height="240" fill="#101e36"/>
         <circle cx="100" cy="82" r="42" fill="#6d549c"/>
         <path d="M35 225 C35 162 165 162 165 225 Z" fill="#6d549c"/>
         <text x="100" y="233" text-anchor="middle" fill="#94a3b8" font-family="sans-serif" font-size="11">შსს ფოტო</text>
@@ -1536,7 +1860,6 @@
           setAuthState('', null);
         }
       } catch (err) {
-        // If network error, still try to use saved state
         if (currentUser) {
           setAuthState(authToken, currentUser);
         } else {
@@ -1565,6 +1888,213 @@
     adminPanelOpenBtn.addEventListener('click', () => {
       openAdminPanel();
     });
+
+    // ==========================================
+    // CAMERA & FACE RECOGNITION (AI BIOMETRICS)
+    // ==========================================
+    const cameraModal = document.getElementById('cameraModal');
+    const openCameraBtn = document.getElementById('openCameraBtn');
+    const closeCameraModalBtn = document.getElementById('closeCameraModalBtn');
+    const tabLiveCamBtn = document.getElementById('tabLiveCamBtn');
+    const tabUploadPicBtn = document.getElementById('tabUploadPicBtn');
+    const liveCamSection = document.getElementById('liveCamSection');
+    const uploadCamSection = document.getElementById('uploadCamSection');
+    const cameraVideo = document.getElementById('cameraVideo');
+    const snapPhotoBtn = document.getElementById('snapPhotoBtn');
+    const flipCameraBtn = document.getElementById('flipCameraBtn');
+    const cameraDropZone = document.getElementById('cameraDropZone');
+    const cameraFileInput = document.getElementById('cameraFileInput');
+    const triggerFileSelectBtn = document.getElementById('triggerFileSelectBtn');
+    const uploadPreviewImg = document.getElementById('uploadPreviewImg');
+    const analyzeUploadedBtn = document.getElementById('analyzeUploadedBtn');
+    const cameraLoadingState = document.getElementById('cameraLoadingState');
+    const cameraMatchResult = document.getElementById('cameraMatchResult');
+
+    let cameraStream = null;
+    let currentFacingMode = 'environment';
+    let stagedCameraUpload = null;
+
+    openCameraBtn.addEventListener('click', () => {
+      cameraModal.classList.add('open');
+      switchCameraTab('live');
+    });
+
+    closeCameraModalBtn.addEventListener('click', () => {
+      cameraModal.classList.remove('open');
+      stopCamera();
+    });
+
+    function switchCameraTab(tab) {
+      if (tab === 'live') {
+        tabLiveCamBtn.className = 'btn btn-primary btn-sm';
+        tabUploadPicBtn.className = 'btn btn-secondary btn-sm';
+        liveCamSection.style.display = 'block';
+        uploadCamSection.style.display = 'none';
+        cameraMatchResult.style.display = 'none';
+        startCamera();
+      } else {
+        tabLiveCamBtn.className = 'btn btn-secondary btn-sm';
+        tabUploadPicBtn.className = 'btn btn-primary btn-sm';
+        liveCamSection.style.display = 'none';
+        uploadCamSection.style.display = 'block';
+        stopCamera();
+      }
+    }
+
+    tabLiveCamBtn.addEventListener('click', () => switchCameraTab('live'));
+    tabUploadPicBtn.addEventListener('click', () => switchCameraTab('upload'));
+
+    async function startCamera() {
+      stopCamera();
+      try {
+        const constraints = {
+          video: {
+            facingMode: currentFacingMode,
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          },
+          audio: false
+        };
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        cameraVideo.srcObject = cameraStream;
+        await cameraVideo.play();
+      } catch (err) {
+        try {
+          cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          cameraVideo.srcObject = cameraStream;
+          await cameraVideo.play();
+        } catch (e2) {
+          console.warn('Camera error:', e2);
+          alert('კამერასთან წვდომა ვერ მოხერხდა. გთხოვთ მიანიჭოთ კამერის ნებართვა ან გამოიყენოთ „ფოტოს ატვირთვა“.');
+          switchCameraTab('upload');
+        }
+      }
+    }
+
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+      }
+    }
+
+    flipCameraBtn.addEventListener('click', () => {
+      currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+      startCamera();
+    });
+
+    snapPhotoBtn.addEventListener('click', () => {
+      const canvas = document.getElementById('cameraCanvas');
+      canvas.width = cameraVideo.videoWidth || 640;
+      canvas.height = cameraVideo.videoHeight || 480;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+      const snapshot = canvas.toDataURL('image/jpeg', 0.88);
+      analyzePhoto(snapshot);
+    });
+
+    triggerFileSelectBtn.addEventListener('click', () => cameraFileInput.click());
+    cameraDropZone.addEventListener('click', (e) => {
+      if (e.target !== triggerFileSelectBtn) cameraFileInput.click();
+    });
+
+    cameraFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        stagedCameraUpload = reader.result;
+        uploadPreviewImg.src = stagedCameraUpload;
+        uploadPreviewImg.style.display = 'block';
+        analyzeUploadedBtn.style.display = 'inline-flex';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    analyzeUploadedBtn.addEventListener('click', () => {
+      if (stagedCameraUpload) {
+        analyzePhoto(stagedCameraUpload);
+      }
+    });
+
+    async function analyzePhoto(imageDataUrl) {
+      cameraLoadingState.style.display = 'block';
+      cameraMatchResult.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/face-search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-auth-token': authToken
+          },
+          body: JSON.stringify({ image_data: imageDataUrl })
+        });
+        const data = await res.json();
+        cameraLoadingState.style.display = 'none';
+        cameraMatchResult.style.display = 'block';
+
+        if (data.ok && data.person) {
+          const p = data.person;
+          const avatar = getPersonAvatar(p);
+          cameraMatchResult.innerHTML = `
+            <div style="background: linear-gradient(135deg, #0d2342 0%, #081528 100%); border: 2px solid var(--gold); border-radius: 12px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <span class="role-badge role-admin" style="background: #10b981; color: #fff; font-size: 0.82rem; padding: 5px 12px;">
+                  🎯 ${data.confidence}% ბიომეტრიული დამთხვევა!
+                </span>
+                <span style="font-size: 0.8rem; color: var(--gold-light);">შსს საიდენტიფიკაციო სისტემა</span>
+              </div>
+
+              <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 14px;">
+                <div style="position: relative; flex-shrink: 0;">
+                  <img src="${escapeHtml(avatar)}" style="width: 72px; height: 86px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gold);" />
+                  <img src="${imageDataUrl}" style="width: 36px; height: 44px; object-fit: cover; border-radius: 6px; border: 1.5px solid #10b981; position: absolute; bottom: -6px; right: -8px; box-shadow: 0 4px 10px rgba(0,0,0,0.6);" title="გადაღებული კადრი" />
+                </div>
+                <div>
+                  <h4 style="font-size: 1.15rem; color: #fff; font-weight: 800;">
+                    ${escapeHtml(p.saxeli)} ${escapeHtml(p.gvari)}
+                  </h4>
+                  <div style="font-size: 0.86rem; color: var(--gold-light); margin-top: 2px;">
+                    პირადი #: <span class="mono"><strong>${escapeHtml(p.piradi || '—')}</strong></span>
+                  </div>
+                  <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                    მამა: ${escapeHtml(p.mamis_saxeli || '—')} | დაბადება: ${escapeHtml(formatDateGeo(p.dab_weli).formatted)}
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-gold" style="flex: 2; justify-content: center;" onclick="document.getElementById('cameraModal').classList.remove('open'); stopCamera(); openPersonModal(${p.id});">
+                  📄 სრული დოსიეს გახსნა
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;" onclick="startCamera(); document.getElementById('cameraMatchResult').style.display='none';">
+                  🔄 ხელახლა გადაღება
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          cameraMatchResult.innerHTML = `
+            <div style="background: rgba(239,68,68,0.12); border: 1px solid var(--danger); border-radius: 10px; padding: 14px; text-align: center;">
+              <div style="color: #fca5a5; font-weight: 800; font-size: 0.95rem; margin-bottom: 6px;">
+                ⚠️ ბიომეტრიული არქივი
+              </div>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">
+                ${escapeHtml(data.message || 'დამთხვევა ვერ მოიძებნა. სცადეთ სხვა კუთხიდან გადაღება ან შეიყვანეთ სახელი საძიებო ზოლში.')}
+              </p>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="startCamera(); document.getElementById('cameraMatchResult').style.display='none';">
+                📸 კიდევ სცადეთ
+              </button>
+            </div>
+          `;
+        }
+      } catch (err) {
+        cameraLoadingState.style.display = 'none';
+        cameraMatchResult.style.display = 'block';
+        cameraMatchResult.innerHTML = `<div style="color:var(--danger); padding:10px; text-align:center;">შეცდომა: ${escapeHtml(err.message)}</div>`;
+      }
+    }
 
     // ==========================================
     // ADMIN PANEL TABS & USER MANAGEMENT
@@ -1654,7 +2184,6 @@
 
     document.getElementById('refreshUsersBtn').addEventListener('click', loadSystemUsers);
 
-    // Create User Form Submission
     document.getElementById('createUserForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const feedback = document.getElementById('createUserFeedback');
