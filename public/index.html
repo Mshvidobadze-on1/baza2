@@ -961,6 +961,83 @@
       100% { width: 100%; }
     }
 
+    /* Co-Residents Sub-row & Table */
+    .residents-subrow {
+      background: #050d1a !important;
+      border-left: 3px solid var(--gold);
+    }
+
+    .residents-wrap-box {
+      background: #0a1426;
+      border: 1px solid rgba(201, 156, 58, 0.35);
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .residents-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .residents-header-title {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .resident-table-mini {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+    }
+
+    .resident-table-mini th {
+      background: #0d1a33;
+      color: var(--text-muted);
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .resident-table-mini td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .resident-table-mini tr:hover td {
+      background: rgba(201, 156, 58, 0.08);
+    }
+
+    .copy-pill {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 6px;
+      background: rgba(201, 156, 58, 0.15);
+      border: 1px solid rgba(201, 156, 58, 0.3);
+      border-radius: 4px;
+      font-size: 0.76rem;
+      color: var(--gold-light);
+      transition: all 0.15s;
+    }
+
+    .copy-pill:hover {
+      background: rgba(201, 156, 58, 0.3);
+      color: #fff;
+    }
+
     /* ============================================================ */
     /* RESPONSIVE DESIGN (PHONES, TABLETS & COMPACT SCREENS)        */
     /* ============================================================ */
@@ -1450,7 +1527,7 @@
         <div id="coResidentsSection" style="margin-top: 18px; display: none;">
           <h3 style="font-size: 0.92rem; color: var(--gold-light); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
             <svg class="svg-icon-sm" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            ამავე მისამართზე და გვარზე რეგისტრირებული ოჯახის წევრები
+            ამავე მისამართზე რეგისტრირებული პირები (ოჯახი / მეზობლები)
           </h3>
           <div class="table-container" style="max-height: 220px;">
             <table>
@@ -2450,12 +2527,21 @@
             <td>${escapeHtml(r.raioni || '—')}</td>
             <td>${escapeHtml(r.mocmobis || '—')}</td>
             <td style="text-align: right;">
-              <div style="display: inline-flex; gap: 6px;">
+              <div style="display: inline-flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary btn-sm" data-toggle-residents="${r.id}" data-quca="${escapeHtml(r.quca || '')}" title="ამ მისამართზე მცხოვრები სხვა პირები (ოჯახი / მეზობლები)">
+                  🏠 მისამართის ხალხი
+                </button>
                 <button type="button" class="btn btn-gold btn-sm" data-open-dossier="${r.id}">
                   📄 სრულად ნახვა
                 </button>
                 ${isAdmin ? `<button type="button" class="btn btn-secondary btn-sm" data-edit-admin="${r.id}" title="რედაქტირება">✏️</button>` : ''}
               </div>
+            </td>
+          </tr>
+
+          <tr id="resRow-${r.id}" class="residents-subrow" style="display: none;">
+            <td colspan="10" style="padding: 12px 16px;">
+              <div id="resBox-${r.id}" class="residents-wrap-box"></div>
             </td>
           </tr>
         `);
@@ -2512,6 +2598,15 @@
         return;
       }
 
+      const resBtn = e.target.closest('[data-toggle-residents]');
+      if (resBtn) {
+        e.stopPropagation();
+        const idNum = parseInt(resBtn.dataset.toggleResidents, 10);
+        const quca = resBtn.dataset.quca || '';
+        toggleResidentsSubrow(idNum, quca);
+        return;
+      }
+
       const qucaEl = e.target.closest('[data-filter-quca]');
       if (qucaEl && qucaEl.dataset.filterQuca) {
         e.stopPropagation();
@@ -2530,6 +2625,137 @@
         renderTable(lastRows);
       }
     });
+
+    async function toggleResidentsSubrow(personId, quca) {
+      const row = document.getElementById(`resRow-${personId}`);
+      const box = document.getElementById(`resBox-${personId}`);
+      if (!row || !box) return;
+
+      if (row.style.display !== 'none') {
+        row.style.display = 'none';
+        return;
+      }
+
+      row.style.display = 'table-row';
+
+      if (box.dataset.loaded === 'true') {
+        return;
+      }
+
+      box.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--gold-light); font-size: 0.88rem; padding: 10px 0;">
+          <span class="spinner" style="border-top-color: var(--gold);"></span>
+          იძებნება ამ მისამართზე (${escapeHtml(quca)}) რეგისტრირებული პირები...
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`/api/address-residents?quca=${encodeURIComponent(quca)}&excludeId=${personId}`, {
+          headers: { 'x-auth-token': authToken }
+        });
+        const data = await res.json();
+        const residents = data.residents || [];
+        box.dataset.loaded = 'true';
+
+        if (residents.length === 0) {
+          box.innerHTML = `
+            <div class="residents-header-row">
+              <div class="residents-header-title">
+                🏠 მისამართი: ${escapeHtml(quca)}
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('resRow-${personId}').style.display='none'">დახურვა ✕</button>
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.86rem; padding: 6px 0;">
+              ამ მისამართზე სხვა რეგისტრირებული პირი არ იძებნება.
+            </div>
+          `;
+          return;
+        }
+
+        box.innerHTML = `
+          <div class="residents-header-row">
+            <div class="residents-header-title">
+              🏠 მისამართზე ჩაწერილი სხვა პირები (${escapeHtml(quca)}) — სულ: ${residents.length} პირი
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="qucaInput.value='${escapeHtml(quca)}'; performSearch(0);">
+                🔍 მთლიანი სიის ნახვა
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('resRow-${personId}').style.display='none'">
+                დახურვა ✕
+              </button>
+            </div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="resident-table-mini">
+              <thead>
+                <tr>
+                  <th>პირადი ნომერი</th>
+                  <th>გვარი და სახელი</th>
+                  <th>მამის სახელი</th>
+                  <th>დაბადების თარიღი</th>
+                  <th>სქესი</th>
+                  <th>მოწმობის #</th>
+                  <th style="text-align: right;">მოქმედება</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${residents.map(r => {
+                  const rDab = formatDateGeo(r.dab_weli);
+                  const sqText = String(r.sqesi) === '1' ? 'მამრ' : (String(r.sqesi) === '2' ? 'მდედრ' : (r.sqesi || '—'));
+                  const rAvatar = getPersonAvatar(r);
+                  return `
+                    <tr>
+                      <td class="mono" style="font-weight: 800; color: #fff;">
+                        <span class="copy-pill" onclick="copyPersonalId('${escapeHtml(r.piradi)}', this)" title="პირადი ნომრის კოპირება">
+                          📋 ${escapeHtml(r.piradi || '—')}
+                        </span>
+                      </td>
+                      <td>
+                        <div class="person-identity-cell">
+                          <img src="${escapeHtml(rAvatar)}" class="person-thumb" style="width: 28px; height: 34px;" />
+                          <strong>${escapeHtml(r.saxeli || '')} ${escapeHtml(r.gvari || '')}</strong>
+                        </div>
+                      </td>
+                      <td>
+                        ${escapeHtml(r.mamis_saxeli || '—')} <span style="color: var(--text-muted); font-size: 0.78rem;">${escapeHtml(r.gvari || '')}</span>
+                      </td>
+                      <td>${escapeHtml(rDab.formatted)}</td>
+                      <td>${sqText}</td>
+                      <td>${escapeHtml(r.mocmobis || '—')}</td>
+                      <td style="text-align: right;">
+                        <button type="button" class="btn btn-gold btn-sm" onclick="openPersonModal(${r.id})">
+                          📄 სრულად ნახვა
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        box.innerHTML = `<div style="color: var(--danger); font-size: 0.86rem;">შეცდომა მაცხოვრებლების ჩატვირთვისას: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function copyPersonalId(pid, el) {
+      if (!pid) return;
+      navigator.clipboard.writeText(pid).then(() => {
+        const prev = el.innerHTML;
+        el.innerHTML = '✓ დაკოპირდა!';
+        el.style.background = 'rgba(16, 185, 129, 0.3)';
+        el.style.borderColor = '#10b981';
+        el.style.color = '#6ee7b7';
+        setTimeout(() => {
+          el.innerHTML = prev;
+          el.style.background = '';
+          el.style.borderColor = '';
+          el.style.color = '';
+        }, 1800);
+      }).catch(() => {});
+    }
 
     async function openPersonModal(id) {
       const modal = document.getElementById('personModal');

@@ -601,23 +601,23 @@
         html += `
           <h3 class="section-heading" style="margin-top: 10px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            ამავე მისამართზე და გვარზე რეგისტრირებული პირები (ოჯახის წევრები)
+            ამავე მისამართზე რეგისტრირებული პირები (ოჯახი / თანამცხოვრებლები) — ${data.coResidents.length} პირი
           </h3>
           <table class="family-table">
             <thead>
               <tr>
-                <th>პირადი #</th>
+                <th>პირადი ნომერი</th>
                 <th>გვარი</th>
                 <th>სახელი</th>
                 <th>მამის სახელი და გვარი</th>
-                <th>დაბ. თარიღი</th>
+                <th>დაბადების თარიღი</th>
                 <th>მოწმობის #</th>
               </tr>
             </thead>
             <tbody>
-              ${data.coResidents.slice(0, 10).map(c => `
+              ${data.coResidents.slice(0, 50).map(c => `
                 <tr>
-                  <td style="font-family: monospace;">${escapeHtml(c.piradi || '—')}</td>
+                  <td style="font-family: monospace; font-weight: 700; color: #0f172a;">${escapeHtml(c.piradi || '—')}</td>
                   <td><strong>${escapeHtml(c.gvari || '—')}</strong></td>
                   <td><strong>${escapeHtml(c.saxeli || '—')}</strong></td>
                   <td>${escapeHtml(c.mamis_saxeli || '—')} ${escapeHtml(c.gvari || '')}</td>

@@ -32,6 +32,13 @@ db.exec('PRAGMA cache_size = -100000;');
 db.exec('PRAGMA temp_store = MEMORY;');
 db.exec('PRAGMA journal_mode = WAL;');
 
+// Ensure indexes exist for rapid lookups
+try {
+  db.exec('CREATE INDEX IF NOT EXISTS idx_quca ON records(quca);');
+} catch (e) {
+  console.warn('idx_quca creation notice:', e.message);
+}
+
 // Create person_extras table for photos, father's photo, mobile phone, extra addresses, notes
 db.exec(`
   CREATE TABLE IF NOT EXISTS person_extras (
@@ -286,6 +293,38 @@ function executeSearch(params) {
 
   const extraSql = extraWhere.length > 0 ? ' AND ' + extraWhere.join(' AND ') : '';
 
+  if (!gvari && !saxeli && !q && quca) {
+    let rows = db.prepare(`
+      SELECT * FROM records
+      WHERE quca = ?
+      ORDER BY gvari ASC, dab_weli ASC
+      LIMIT ? OFFSET ?
+    `).all(quca, limit, offset);
+
+    if (rows.length === 0 && offset === 0) {
+      rows = db.prepare(`
+        SELECT * FROM records
+        WHERE quca >= ? AND quca < ?
+        ORDER BY quca ASC, gvari ASC
+        LIMIT ? OFFSET ?
+      `).all(quca, quca + '\uffff', limit, offset);
+    }
+
+    if (rows.length === 0 && offset === 0) {
+      rows = db.prepare(`
+        SELECT * FROM records
+        WHERE quca LIKE ?
+        ORDER BY gvari ASC
+        LIMIT ? OFFSET ?
+      `).all('%' + quca + '%', limit, offset);
+    }
+
+    return {
+      rows: attachExtrasToRows(rows),
+      elapsedMs: Date.now() - t0
+    };
+  }
+
   if (gvari || saxeli) {
     let rows = [];
     if (gvari && saxeli) {
@@ -445,6 +484,34 @@ function executeSearch(params) {
         );
       }
 
+      // If name search yielded 0 results, check if query matches address (quca)
+      if (rows.length === 0 && offset === 0 && geoQ.length >= 3) {
+        rows = db.prepare(`
+          SELECT * FROM records
+          WHERE quca = ? ${extraSql}
+          ORDER BY gvari ASC, dab_weli ASC
+          LIMIT ? OFFSET ?
+        `).all(geoQ, ...extraArgs, limit, offset);
+
+        if (rows.length === 0) {
+          rows = db.prepare(`
+            SELECT * FROM records
+            WHERE quca >= ? AND quca < ? ${extraSql}
+            ORDER BY quca ASC, gvari ASC
+            LIMIT ? OFFSET ?
+          `).all(geoQ, geoQ + '\uffff', ...extraArgs, limit, offset);
+        }
+
+        if (rows.length === 0) {
+          rows = db.prepare(`
+            SELECT * FROM records
+            WHERE quca LIKE ? ${extraSql}
+            ORDER BY quca ASC, gvari ASC
+            LIMIT ? OFFSET ?
+          `).all('%' + geoQ + '%', ...extraArgs, limit, offset);
+        }
+      }
+
       return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
     } else if (tokens.length === 1) {
       const word = tokens[0];
@@ -468,6 +535,34 @@ function executeSearch(params) {
           wStem, wStem + '\uffff',
           ...extraArgs, limit, offset
         );
+      }
+
+      // If single token did not match names, check if it's an address word (e.g. street name)
+      if (rows.length === 0 && offset === 0 && word.length >= 3) {
+        rows = db.prepare(`
+          SELECT * FROM records
+          WHERE quca = ? ${extraSql}
+          ORDER BY gvari ASC, dab_weli ASC
+          LIMIT ? OFFSET ?
+        `).all(word, ...extraArgs, limit, offset);
+
+        if (rows.length === 0) {
+          rows = db.prepare(`
+            SELECT * FROM records
+            WHERE quca >= ? AND quca < ? ${extraSql}
+            ORDER BY quca ASC, gvari ASC
+            LIMIT ? OFFSET ?
+          `).all(word, word + '\uffff', ...extraArgs, limit, offset);
+        }
+
+        if (rows.length === 0) {
+          rows = db.prepare(`
+            SELECT * FROM records
+            WHERE quca LIKE ? ${extraSql}
+            ORDER BY quca ASC, gvari ASC
+            LIMIT ? OFFSET ?
+          `).all('%' + word + '%', ...extraArgs, limit, offset);
+        }
       }
 
       return { rows: attachExtrasToRows(rows), elapsedMs: Date.now() - t0 };
@@ -882,12 +977,15 @@ const server = http.createServer(async (req, res) => {
 
       const person = attachExtrasToRows([rawPerson])[0];
 
-      // Find co-residents / family members by same surname + address
+      // Find ALL co-residents registered at this exact address (family with same surname first, then all others)
       let coResidents = [];
-      if (person.quca && person.quca.length > 6) {
-        const rawCo = db.prepare(
-          'SELECT * FROM records WHERE gvari = ? AND quca = ? AND id != ? LIMIT 30'
-        ).all(person.gvari, person.quca, person.id);
+      if (person.quca && person.quca.length > 5 && !person.quca.includes('მისამართის გარეშე')) {
+        const rawCo = db.prepare(`
+          SELECT * FROM records 
+          WHERE quca = ? AND id != ? 
+          ORDER BY (gvari = ?) DESC, gvari ASC, dab_weli ASC 
+          LIMIT 100
+        `).all(person.quca, person.id, person.gvari);
         coResidents = attachExtrasToRows(rawCo);
       }
 
@@ -899,6 +997,32 @@ const server = http.createServer(async (req, res) => {
       }
 
       return sendJson(200, { person, coResidents, likelyFather, userRole: session.role });
+    }
+
+    // API: Address Co-residents (everyone registered at given address)
+    if (pathname === '/api/address-residents') {
+      const session = getSession(req);
+      if (!session) {
+        return sendJson(401, { ok: false, error: 'ავტორიზაცია აუცილებელია' });
+      }
+      const rawQuca = (parsedUrl.searchParams.get('quca') || '').trim();
+      const quca = ensureGeorgian(rawQuca);
+      const excludeId = parseInt(parsedUrl.searchParams.get('excludeId') || '0', 10);
+
+      if (!quca || quca.length < 3 || quca.toLowerCase().includes('misamartis garese') || quca.includes('მისამართის გარეშე')) {
+        return sendJson(200, { ok: true, residents: [], total: 0 });
+      }
+
+      const rows = db.prepare(`
+        SELECT id, piradi, gvari, saxeli, mamis_saxeli, dab_weli, sqesi, mocmobis, quca, raioni
+        FROM records
+        WHERE quca = ? AND id != ?
+        ORDER BY gvari ASC, dab_weli ASC
+        LIMIT 200
+      `).all(quca, excludeId);
+
+      const enriched = attachExtrasToRows(rows);
+      return sendJson(200, { ok: true, residents: enriched, total: enriched.length, quca });
     }
 
     // API: Face / Camera Biometric Recognition Search

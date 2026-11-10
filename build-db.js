@@ -226,9 +226,10 @@ async function buildDatabase() {
   db.exec('COMMIT');
   console.log(`Inserted ${rowId.toLocaleString()} rows in ${((Date.now() - startTime) / 1000).toFixed(1)}s. Building indexes...`);
 
-  db.exec('CREATE INDEX idx_gvari_saxeli ON records(gvari, saxeli);');
-  db.exec('CREATE INDEX idx_saxeli_gvari ON records(saxeli, gvari);');
-  db.exec('CREATE INDEX idx_piradi ON records(piradi);');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_gvari_saxeli ON records(gvari, saxeli);');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_saxeli_gvari ON records(saxeli, gvari);');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_piradi ON records(piradi);');
+  db.exec('CREATE INDEX IF NOT EXISTS idx_quca ON records(quca);');
 
   db.exec('PRAGMA journal_mode = WAL;');
   db.exec('PRAGMA synchronous = NORMAL;');
